@@ -2,6 +2,8 @@
 
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import reactRecommended from 'eslint-plugin-react/configs/recommended.js'
+import reactJsxRuntime from 'eslint-plugin-react/configs/jsx-runtime.js'
 
 export default tseslint.config(
     eslint.configs.recommended,
@@ -10,6 +12,8 @@ export default tseslint.config(
         extends: [
             ...tseslint.configs.strictTypeChecked,
             ...tseslint.configs.stylisticTypeChecked,
+            reactRecommended,
+            reactJsxRuntime,
         ],
         rules: {
             "@typescript-eslint/no-confusing-void-expression": [
@@ -26,5 +30,10 @@ export default tseslint.config(
                 tsconfigRootDir: import.meta.dirname,
             },
         },
+        settings: {
+            react: {
+                version: "detect"
+            }
+        }
     }
 );
