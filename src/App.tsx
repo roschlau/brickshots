@@ -1,33 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import {useState} from 'react'
 import './App.css'
+import {loadProject} from './persistence.ts'
+import {Scene, Shot} from './model.ts'
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const [project] = useState(loadProject())
+  const scenes = project.scenes.map(scene => {
+    return <SceneTableRows key={scene.code} scene={scene}/>
+  })
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <h1 className="text-3xl mb-4">{project.name}</h1>
+      <div className="grid gap-2 justify-items-start items-baseline">
+        {scenes}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+    </>
+  )
+}
+
+function SceneTableRows({scene}: { scene: Scene }) {
+  const shots = scene.shots.map(shot => <ShotTableRow key={shot.code} shot={shot} sceneCode={scene.code}/>)
+  return (
+    <>
+      <div className="col-start-1 col-span-5 mt-4">
+        {scene.name}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {shots}
+    </>
+  )
+}
+
+function ShotTableRow({shot, sceneCode}: { shot: Shot, sceneCode: number }) {
+  return (
+    <>
+      <div className={'col-start-1 text-sm ' + (shot.isCodeFrozen ? 'text-slate-100' : 'text-slate-500')}>
+        {sceneCode}-{shot.code}
+      </div>
+      <div className="col-start-2">
+        {shot.location}
+      </div>
+      <div className="col-start-3">
+        {shot.description}
+      </div>
+      <div className="col-start-4">
+        {shot.notes}
+      </div>
+      <div className="col-start-5">
+        {shot.animated}
+      </div>
     </>
   )
 }
