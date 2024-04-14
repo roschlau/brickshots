@@ -1,7 +1,9 @@
-import {Project} from './model.ts'
-
-export function loadProject(): Project {
-  return new Project({
+export function loadProject(): ProjectData {
+  const existing = localStorage.getItem('project')
+  if (existing) {
+    return JSON.parse(existing) as ProjectData
+  }
+  return {
     name: 'Dummy Project',
     scenes: [
       {
@@ -45,7 +47,7 @@ export function loadProject(): Project {
         ],
       },
     ],
-  })
+  }
 }
 
 export interface ProjectData {
