@@ -56,15 +56,19 @@ export interface ProjectData {
 }
 
 export interface SceneData {
-  frozenCode: number | null
+  lockedCode: number | null
   name: string
   shots: ShotData[]
 }
 
 export interface ShotData {
-  frozenCode: number | null
+  lockedCode: number | null
   description: string
   location: string | null
   notes: string
   animated: boolean
+}
+
+export function code(element: { lockedCode: number | null }, index: number) {
+  return element.lockedCode ?? (index + 1)
 }

@@ -1,18 +1,26 @@
 import {useEffect, useState} from 'react'
 import './App.css'
-import {loadProject, SceneData, ShotData} from './persistence.ts'
+import {code, dummyProject, loadProject, SceneData, ShotData} from './persistence.ts'
+import clipboard from 'clipboardy'
 
 function App() {
   const [project, setProject] = useState(loadProject())
-  console.log(project.scenes.flatMap(scene => scene.shots).filter(shot => shot.animated).map(shot => shot.description))
   useEffect(() => localStorage.setItem('project', JSON.stringify(project)), [project])
-  const scenes = project.scenes.map((scene, index) => {
+  console.log(project.scenes.flatMap((scene, sceneIndex) => scene.shots
+    .filter(shot => shot.lockedCode != null)
+    .map((shot, shotIndex) => code(scene, sceneIndex).toString() + '-' + code(shot, shotIndex).toString())
+  ))
+  const scenes = project.scenes.map((scene, sceneIndex) => {
+    function updateScene(updatedScene: SceneData) {
+      setProject({...project, scenes: project.scenes.map((oldScene, i) => i === sceneIndex ? updatedScene : oldScene)})
+    }
+
     return (
       <SceneTableRows
-        key={scene.frozenCode ?? index}
+        key={code(scene, sceneIndex)}
         scene={scene}
-        sceneIndex={index}
-        onUpdate={(updatedScene => setProject({ ...project, scenes: project.scenes.map((oldScene, i) => i === index ? updatedScene : oldScene) }))}
+        sceneIndex={sceneIndex}
+        onUpdate={updateScene}
       />
     )
   })
@@ -26,16 +34,29 @@ function App() {
   )
 }
 
-function SceneTableRows({scene, sceneIndex, onUpdate}: { scene: SceneData, sceneIndex: number, onUpdate: (scene: SceneData) => void }) {
-  const shots = scene.shots.map((shot, index) => (
-    <ShotTableRow
-      key={shot.frozenCode ?? index}
-      shot={shot}
-      sceneCode={scene.frozenCode ?? sceneIndex}
-      shotIndex={index}
-      onUpdate={(updatedShot) => onUpdate({ ...scene, shots: scene.shots.map((oldShot, i) => i === index ? updatedShot : oldShot) })}
-    />
-  ))
+function SceneTableRows({scene, sceneIndex, onUpdate}: {
+  scene: SceneData,
+  sceneIndex: number,
+  onUpdate: (scene: SceneData) => void
+}) {
+  const shots = scene.shots.map((shot, shotIndex) => {
+    const updateShot = (updatedShot: ShotData) => {
+      onUpdate({
+        ...scene,
+        lockedCode: updatedShot.lockedCode && !scene.lockedCode ? code(scene, sceneIndex) : scene.lockedCode,
+        shots: scene.shots.map((oldShot, i) => i === shotIndex ? updatedShot : oldShot),
+      })
+    }
+    return (
+      <ShotTableRow
+        key={code(shot, shotIndex)}
+        shot={shot}
+        sceneCode={code(scene, sceneIndex)}
+        shotIndex={shotIndex}
+        onUpdate={updateShot}
+      />
+    )
+  })
   return (
     <>
       <div className="col-start-1 col-span-5 mt-4">
@@ -50,12 +71,22 @@ function ShotTableRow({shot, sceneCode, shotIndex, onUpdate}: {
   shot: ShotData,
   sceneCode: number,
   shotIndex: number,
-  onUpdate: (shot: ShotData) => void
+  onUpdate: (shot: ShotData) => void,
 }) {
+  const shotFullCode = sceneCode.toString() + '-' + code(shot, shotIndex).toString()
+  function shotCodeClicked() {
+    if (shot.lockedCode === null) {
+      onUpdate({...shot, lockedCode: code(shot, shotIndex)})
+    }
+    void clipboard.write(shotFullCode)
+  }
   return (
     <>
-      <div className={'col-start-1 text-sm ' + (shot.frozenCode ? 'text-slate-100' : 'text-slate-500')}>
-        {sceneCode}-{shot.frozenCode ?? shotIndex}
+      <div
+        className={'col-start-1 text-sm cursor-pointer ' + ((shot.lockedCode != null) ? 'text-slate-100' : 'text-slate-500')}
+        onClick={shotCodeClicked}
+      >
+        {shotFullCode}
       </div>
       <div className="col-start-2">
         <input
