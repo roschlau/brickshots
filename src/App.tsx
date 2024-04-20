@@ -22,9 +22,10 @@ function App() {
     )
   })
   const resetProject = () => setProject(dummyProject)
+  const backupProject = () => localStorage.setItem('backup-' + new Date().toISOString(), JSON.stringify(project))
   return (
     <>
-      <DevBar className={'absolute top-0 right-0'} onResetProject={resetProject}/>
+      <DevBar onResetProject={resetProject} onBackupProject={backupProject}/>
       <h1 className="text-3xl mb-4">{project.name}</h1>
       <div className="grid gap-2 justify-items-start items-baseline">
         {scenes}
@@ -33,11 +34,17 @@ function App() {
   )
 }
 
-function DevBar({className, onResetProject}: { className?: string, onResetProject: () => void }) {
+function DevBar({onResetProject, onBackupProject}: {
+  onResetProject: () => void,
+  onBackupProject: () => void
+}) {
   return (
-    <div className={className}>
-      <button onClick={onResetProject}>
-        Reset Project
+    <div className={'absolute top-0 right-0 flex flex-row'}>
+      <button className={'p-2'} onClick={onBackupProject}>
+        Backup
+      </button>
+      <button className={'p-2'} onClick={onResetProject}>
+        Reset
       </button>
     </div>
   )
@@ -122,6 +129,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
       }
     }
   }
+
   return (
     <>
       <div
@@ -134,28 +142,28 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
         <input
           type={'text'}
           value={shot.location ?? ''}
-          onChange={value => onUpdate({ ...shot, location: value.target.value})}
+          onChange={value => onUpdate({...shot, location: value.target.value})}
         />
       </div>
       <div className="col-start-3">
         <textarea
           rows={1}
           value={shot.description}
-          onChange={value => onUpdate({ ...shot, description: value.target.value})}
+          onChange={value => onUpdate({...shot, description: value.target.value})}
         ></textarea>
       </div>
       <div className="col-start-4">
         <textarea
           rows={1}
           value={shot.notes}
-          onChange={value => onUpdate({ ...shot, notes: value.target.value})}
+          onChange={value => onUpdate({...shot, notes: value.target.value})}
         ></textarea>
       </div>
       <div className="col-start-5">
         <input
           type={'checkbox'}
           checked={shot.animated}
-          onChange={value => onUpdate({ ...shot, animated: value.target.checked})}
+          onChange={value => onUpdate({...shot, animated: value.target.checked})}
         />
       </div>
       <div className="col-start-6">
