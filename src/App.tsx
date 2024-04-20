@@ -58,6 +58,12 @@ function SceneTableRows({scene, sceneIndex, onUpdate}: {
         shots: scene.shots.map((oldShot, i) => i === shotIndex ? updatedShot : oldShot),
       })
     }
+    const deleteShot = () => {
+      onUpdate({
+        ...scene,
+        shots: scene.shots.filter((_, i) => i !== shotIndex),
+      })
+    }
     const shotNumber = shot.lockedNumber ?? nextShotAutoNumber(shotNumbers[shotIndex - 1] ?? 0, lockedShotNumbers)
     shotNumbers[shotIndex] = shotNumber
     return (
@@ -67,6 +73,7 @@ function SceneTableRows({scene, sceneIndex, onUpdate}: {
         sceneNumber={sceneNumber(scene, sceneIndex)}
         shotNumber={shotNumber}
         onUpdate={updateShot}
+        onDelete={deleteShot}
       />
     )
   })
@@ -84,13 +91,15 @@ function SceneTableRows({scene, sceneIndex, onUpdate}: {
   )
 }
 
-function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate}: {
+function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
   shot: ShotData,
   sceneNumber: number,
   shotNumber: number,
   onUpdate: (shot: ShotData) => void,
+  onDelete: () => void,
 }) {
   const shotFullCode = shotCode(sceneNumber, shotNumber)
+
   function shotCodeClicked() {
     if (shot.lockedNumber === null) {
       onUpdate({...shot, lockedNumber: shotNumber})
@@ -148,6 +157,13 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate}: {
           checked={shot.animated}
           onChange={value => onUpdate({ ...shot, animated: value.target.checked})}
         />
+      </div>
+      <div className="col-start-6">
+        <button
+          onClick={onDelete}
+        >
+          Delete
+        </button>
       </div>
     </>
   )
