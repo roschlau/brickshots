@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 import './App.css'
-import {dummyProject, loadProject, SceneData, ShotData} from './persistence.ts'
+import {blankShot, dummyProject, loadProject, SceneData, ShotData} from './persistence.ts'
 import clipboard from 'clipboardy'
 import {nextShotAutoNumber, sceneNumber, shotCode} from './codes.ts'
 
@@ -33,7 +33,7 @@ function App() {
   )
 }
 
-function DevBar({className, onResetProject}: {className?: string, onResetProject: () => void}) {
+function DevBar({className, onResetProject}: { className?: string, onResetProject: () => void }) {
   return (
     <div className={className}>
       <button onClick={onResetProject}>
@@ -70,12 +70,16 @@ function SceneTableRows({scene, sceneIndex, onUpdate}: {
       />
     )
   })
+  const addShot = () => onUpdate({...scene, shots: [...scene.shots, blankShot()]})
   return (
     <>
       <div className="col-start-1 col-span-5 mt-4">
         {scene.name}
       </div>
       {shots}
+      <button onClick={addShot}>
+        + Add Shot
+      </button>
     </>
   )
 }

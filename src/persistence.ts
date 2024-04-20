@@ -72,3 +72,13 @@ export interface ShotData {
   notes: string
   animated: boolean
 }
+
+export function blankShot(): ShotData {
+  return {
+    lockedNumber: null,
+    description: '',
+    location: null,
+    notes: '',
+    animated: false,
+  }
+}
