@@ -62,6 +62,13 @@ export interface SceneData {
   shots: ShotData[]
 }
 
+export function blankScene(): SceneData {
+  return {
+    lockedNumber: null,
+    shots: [],
+  }
+}
+
 export interface ShotData {
   lockedNumber: number | null
   description: string

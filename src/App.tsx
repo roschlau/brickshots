@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 import './App.css'
-import {blankShot, dummyProject, loadProject, SceneData, ShotData} from './persistence.ts'
+import {blankScene, blankShot, dummyProject, loadProject, SceneData, ShotData} from './persistence.ts'
 import clipboard from 'clipboardy'
 import {nextShotAutoNumber, getSceneNumber, shotCode} from './codes.ts'
 
@@ -23,12 +23,16 @@ function App() {
   })
   const resetProject = () => setProject(dummyProject)
   const backupProject = () => localStorage.setItem('backup-' + new Date().toISOString(), JSON.stringify(project))
+  const addScene = () => setProject({ ...project, scenes: [...project.scenes, blankScene()] })
   return (
     <>
       <DevBar onResetProject={resetProject} onBackupProject={backupProject}/>
       <h1 className="text-3xl mb-4">{project.name}</h1>
       <div className="grid gap-2 justify-items-start items-baseline">
         {scenes}
+        <button className={'col-start-1'} onClick={addScene}>
+          + Add Scene
+        </button>
       </div>
     </>
   )
@@ -92,7 +96,7 @@ function SceneTableRows({scene, sceneIndex, onUpdate}: {
         Scene {sceneNumber}
       </div>
       {shots}
-      <button onClick={addShot}>
+      <button className={'col-start-1'} onClick={addShot}>
         + Add Shot
       </button>
     </>
