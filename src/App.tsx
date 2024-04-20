@@ -74,6 +74,7 @@ function ShotTableRow({shot, sceneCode, shotIndex, onUpdate}: {
       <div className="col-start-4">
         <textarea
           rows={1}
+          value={shot.notes}
           onChange={value => onUpdate({ ...shot, notes: value.target.value})}
         ></textarea>
       </div>
