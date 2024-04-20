@@ -107,7 +107,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
 }) {
   const shotFullCode = shotCode(sceneNumber, shotNumber)
 
-  function shotCodeClicked() {
+  const shotCodeClicked = () => {
     if (shot.lockedNumber === null) {
       onUpdate({...shot, lockedNumber: shotNumber})
       void clipboard.write(shotFullCode)
@@ -128,6 +128,10 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
         void clipboard.write(sceneNumber.toString() + '-' + parsed.toString())
       }
     }
+  }
+
+  const setAnimated = (animated: boolean) => {
+    onUpdate({...shot, animated, lockedNumber: animated && shot.lockedNumber === null ? shotNumber : shot.lockedNumber })
   }
 
   return (
@@ -163,7 +167,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
         <input
           type={'checkbox'}
           checked={shot.animated}
-          onChange={value => onUpdate({...shot, animated: value.target.checked})}
+          onChange={value => setAnimated(value.target.checked)}
         />
       </div>
       <div className="col-start-6">
