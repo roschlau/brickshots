@@ -3,22 +3,26 @@ export function loadProject(): ProjectData {
   if (existing) {
     return JSON.parse(existing) as ProjectData
   }
+  return dummyProject()
+}
+
+export function dummyProject(): ProjectData {
   return {
     name: 'Dummy Project',
     scenes: [
       {
-        frozenCode: null,
+        lockedCode: null,
         name: 'Scene 1',
         shots: [
           {
-            frozenCode: null,
+            lockedCode: null,
             description: 'Shot 1',
             notes: 'Some Notes',
             animated: true,
             location: 'Int. Garden',
           },
           {
-            frozenCode: null,
+            lockedCode: null,
             description: 'Shot 2',
             notes: '',
             animated: false,
@@ -27,18 +31,18 @@ export function loadProject(): ProjectData {
         ],
       },
       {
-        frozenCode: null,
+        lockedCode: null,
         name: 'Scene 2',
         shots: [
           {
-            frozenCode: 2,
+            lockedCode: null,
             description: 'Shot 1',
-            notes: 'Some Notes',
+            notes: 'More Notes',
             animated: true,
             location: 'Int. Garden',
           },
           {
-            frozenCode: null,
+            lockedCode: null,
             description: 'Shot 2',
             notes: '',
             animated: false,
@@ -48,6 +52,7 @@ export function loadProject(): ProjectData {
       },
     ],
   }
+
 }
 
 export interface ProjectData {

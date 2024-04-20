@@ -24,13 +24,25 @@ function App() {
       />
     )
   })
+  const resetProject = () => setProject(dummyProject)
   return (
     <>
+      <DevBar className={'absolute top-0 right-0'} onResetProject={resetProject}/>
       <h1 className="text-3xl mb-4">{project.name}</h1>
       <div className="grid gap-2 justify-items-start items-baseline">
         {scenes}
       </div>
     </>
+  )
+}
+
+function DevBar({className, onResetProject}: {className?: string, onResetProject: () => void}) {
+  return (
+    <div className={className}>
+      <button onClick={onResetProject}>
+        Reset Project
+      </button>
+    </div>
   )
 }
 
