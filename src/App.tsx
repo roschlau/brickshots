@@ -1,15 +1,12 @@
 import {useEffect, useState} from 'react'
 import './App.css'
-import {code, dummyProject, loadProject, SceneData, ShotData} from './persistence.ts'
+import {dummyProject, loadProject, SceneData, ShotData} from './persistence.ts'
 import clipboard from 'clipboardy'
+import {nextShotAutoNumber, sceneNumber, shotCode} from './codes.ts'
 
 function App() {
   const [project, setProject] = useState(loadProject())
   useEffect(() => localStorage.setItem('project', JSON.stringify(project)), [project])
-  console.log(project.scenes.flatMap((scene, sceneIndex) => scene.shots
-    .filter(shot => shot.lockedCode != null)
-    .map((shot, shotIndex) => code(scene, sceneIndex).toString() + '-' + code(shot, shotIndex).toString())
-  ))
   const scenes = project.scenes.map((scene, sceneIndex) => {
     function updateScene(updatedScene: SceneData) {
       setProject({...project, scenes: project.scenes.map((oldScene, i) => i === sceneIndex ? updatedScene : oldScene)})
@@ -17,7 +14,7 @@ function App() {
 
     return (
       <SceneTableRows
-        key={code(scene, sceneIndex)}
+        key={sceneNumber(scene, sceneIndex)}
         scene={scene}
         sceneIndex={sceneIndex}
         onUpdate={updateScene}
@@ -51,20 +48,24 @@ function SceneTableRows({scene, sceneIndex, onUpdate}: {
   sceneIndex: number,
   onUpdate: (scene: SceneData) => void
 }) {
+  const lockedShotNumbers = scene.shots.map(it => it.lockedNumber).filter((it): it is number => it !== null)
+  const shotNumbers: Record<number, number> = {}
   const shots = scene.shots.map((shot, shotIndex) => {
     const updateShot = (updatedShot: ShotData) => {
       onUpdate({
         ...scene,
-        lockedCode: updatedShot.lockedCode && !scene.lockedCode ? code(scene, sceneIndex) : scene.lockedCode,
+        lockedNumber: updatedShot.lockedNumber && !scene.lockedNumber ? sceneNumber(scene, sceneIndex) : scene.lockedNumber,
         shots: scene.shots.map((oldShot, i) => i === shotIndex ? updatedShot : oldShot),
       })
     }
+    const shotNumber = shot.lockedNumber ?? nextShotAutoNumber(shotNumbers[shotIndex - 1] ?? 0, lockedShotNumbers)
+    shotNumbers[shotIndex] = shotNumber
     return (
       <ShotTableRow
-        key={code(shot, shotIndex)}
+        key={shotNumber}
         shot={shot}
-        sceneCode={code(scene, sceneIndex)}
-        shotIndex={shotIndex}
+        sceneNumber={sceneNumber(scene, sceneIndex)}
+        shotNumber={shotNumber}
         onUpdate={updateShot}
       />
     )
@@ -79,23 +80,39 @@ function SceneTableRows({scene, sceneIndex, onUpdate}: {
   )
 }
 
-function ShotTableRow({shot, sceneCode, shotIndex, onUpdate}: {
+function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate}: {
   shot: ShotData,
-  sceneCode: number,
-  shotIndex: number,
+  sceneNumber: number,
+  shotNumber: number,
   onUpdate: (shot: ShotData) => void,
 }) {
-  const shotFullCode = sceneCode.toString() + '-' + code(shot, shotIndex).toString()
+  const shotFullCode = shotCode(sceneNumber, shotNumber)
   function shotCodeClicked() {
-    if (shot.lockedCode === null) {
-      onUpdate({...shot, lockedCode: code(shot, shotIndex)})
+    if (shot.lockedNumber === null) {
+      onUpdate({...shot, lockedNumber: shotNumber})
+      void clipboard.write(shotFullCode)
+    } else {
+      const newShotCode = window.prompt('Change locked shot code to:', shot.lockedNumber.toString())
+      if (newShotCode !== null) {
+        if (newShotCode.trim().length === 0) {
+          onUpdate({...shot, lockedNumber: null})
+          return
+        }
+        const parsed = parseInt(newShotCode)
+        if (isNaN(parsed)) {
+          throw Error('Invalid shotcode: ' + newShotCode)
+        }
+        if (parsed !== shot.lockedNumber) {
+          onUpdate({...shot, lockedNumber: parsed})
+        }
+        void clipboard.write(sceneNumber.toString() + '-' + parsed.toString())
+      }
     }
-    void clipboard.write(shotFullCode)
   }
   return (
     <>
       <div
-        className={'col-start-1 text-sm cursor-pointer ' + ((shot.lockedCode != null) ? 'text-slate-100' : 'text-slate-500')}
+        className={'col-start-1 text-sm cursor-pointer ' + ((shot.lockedNumber != null) ? 'text-slate-100' : 'text-slate-500')}
         onClick={shotCodeClicked}
       >
         {shotFullCode}

@@ -11,18 +11,18 @@ export function dummyProject(): ProjectData {
     name: 'Dummy Project',
     scenes: [
       {
-        lockedCode: null,
+        lockedNumber: null,
         name: 'Scene 1',
         shots: [
           {
-            lockedCode: null,
+            lockedNumber: null,
             description: 'Shot 1',
             notes: 'Some Notes',
             animated: true,
             location: 'Int. Garden',
           },
           {
-            lockedCode: null,
+            lockedNumber: null,
             description: 'Shot 2',
             notes: '',
             animated: false,
@@ -31,18 +31,18 @@ export function dummyProject(): ProjectData {
         ],
       },
       {
-        lockedCode: null,
+        lockedNumber: null,
         name: 'Scene 2',
         shots: [
           {
-            lockedCode: null,
+            lockedNumber: null,
             description: 'Shot 1',
             notes: 'More Notes',
             animated: true,
             location: 'Int. Garden',
           },
           {
-            lockedCode: null,
+            lockedNumber: null,
             description: 'Shot 2',
             notes: '',
             animated: false,
@@ -52,7 +52,6 @@ export function dummyProject(): ProjectData {
       },
     ],
   }
-
 }
 
 export interface ProjectData {
@@ -61,19 +60,15 @@ export interface ProjectData {
 }
 
 export interface SceneData {
-  lockedCode: number | null
+  lockedNumber: number | null
   name: string
   shots: ShotData[]
 }
 
 export interface ShotData {
-  lockedCode: number | null
+  lockedNumber: number | null
   description: string
   location: string | null
   notes: string
   animated: boolean
-}
-
-export function code(element: { lockedCode: number | null }, index: number) {
-  return element.lockedCode ?? (index + 1)
 }
