@@ -12,7 +12,6 @@ export function dummyProject(): ProjectData {
     scenes: [
       {
         lockedNumber: null,
-        name: 'Scene 1',
         shots: [
           {
             lockedNumber: null,
@@ -32,7 +31,6 @@ export function dummyProject(): ProjectData {
       },
       {
         lockedNumber: null,
-        name: 'Scene 2',
         shots: [
           {
             lockedNumber: null,
@@ -61,7 +59,6 @@ export interface ProjectData {
 
 export interface SceneData {
   lockedNumber: number | null
-  name: string
   shots: ShotData[]
 }
 

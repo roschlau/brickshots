@@ -1,6 +1,6 @@
 import {SceneData} from './persistence.ts'
 
-export function sceneNumber(scene: Pick<SceneData, 'lockedNumber'>, index: number): number {
+export function getSceneNumber(scene: Pick<SceneData, 'lockedNumber'>, index: number): number {
   return scene.lockedNumber ?? index + 1
 }
 

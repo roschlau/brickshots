@@ -1,23 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call  */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access  */
 import {describe, expect, it} from 'bun:test'
-import {nextShotAutoNumber, sceneNumber} from './codes.ts'
+import {nextShotAutoNumber, getSceneNumber} from './codes.ts'
 
 describe('sceneNumber(element, index)', () => {
   it('should return (index+1) if no frozen code is set', () => {
-    expect(sceneNumber({lockedNumber: null}, 0))
+    expect(getSceneNumber({lockedNumber: null}, 0))
       .toBe(1)
-    expect(sceneNumber({lockedNumber: null}, 1))
+    expect(getSceneNumber({lockedNumber: null}, 1))
       .toBe(2)
-    expect(sceneNumber({lockedNumber: null}, 2483))
+    expect(getSceneNumber({lockedNumber: null}, 2483))
       .toBe(2484)
   })
   it('should let lockedCode override the index', () => {
-    expect(sceneNumber({lockedNumber: 3}, 0))
+    expect(getSceneNumber({lockedNumber: 3}, 0))
       .toBe(3)
-    expect(sceneNumber({lockedNumber: 123}, 1))
+    expect(getSceneNumber({lockedNumber: 123}, 1))
       .toBe(123)
-    expect(sceneNumber({lockedNumber: 3}, 2483))
+    expect(getSceneNumber({lockedNumber: 3}, 2483))
       .toBe(3)
   })
 })

@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react'
 import './App.css'
 import {blankShot, dummyProject, loadProject, SceneData, ShotData} from './persistence.ts'
 import clipboard from 'clipboardy'
-import {nextShotAutoNumber, sceneNumber, shotCode} from './codes.ts'
+import {nextShotAutoNumber, getSceneNumber, shotCode} from './codes.ts'
 
 function App() {
   const [project, setProject] = useState(loadProject())
@@ -14,7 +14,7 @@ function App() {
 
     return (
       <SceneTableRows
-        key={sceneNumber(scene, sceneIndex)}
+        key={getSceneNumber(scene, sceneIndex)}
         scene={scene}
         sceneIndex={sceneIndex}
         onUpdate={updateScene}
@@ -57,11 +57,12 @@ function SceneTableRows({scene, sceneIndex, onUpdate}: {
 }) {
   const lockedShotNumbers = scene.shots.map(it => it.lockedNumber).filter((it): it is number => it !== null)
   const shotNumbers: Record<number, number> = {}
+  const sceneNumber = getSceneNumber(scene, sceneIndex)
   const shots = scene.shots.map((shot, shotIndex) => {
     const updateShot = (updatedShot: ShotData) => {
       onUpdate({
         ...scene,
-        lockedNumber: updatedShot.lockedNumber && !scene.lockedNumber ? sceneNumber(scene, sceneIndex) : scene.lockedNumber,
+        lockedNumber: updatedShot.lockedNumber && !scene.lockedNumber ? sceneNumber : scene.lockedNumber,
         shots: scene.shots.map((oldShot, i) => i === shotIndex ? updatedShot : oldShot),
       })
     }
@@ -77,7 +78,7 @@ function SceneTableRows({scene, sceneIndex, onUpdate}: {
       <ShotTableRow
         key={shotNumber}
         shot={shot}
-        sceneNumber={sceneNumber(scene, sceneIndex)}
+        sceneNumber={sceneNumber}
         shotNumber={shotNumber}
         onUpdate={updateShot}
         onDelete={deleteShot}
@@ -87,8 +88,8 @@ function SceneTableRows({scene, sceneIndex, onUpdate}: {
   const addShot = () => onUpdate({...scene, shots: [...scene.shots, blankShot()]})
   return (
     <>
-      <div className="col-start-1 col-span-5 mt-4">
-        {scene.name}
+      <div className="col-start-1 col-span-5 mt-4 font-bold text-lg">
+        Scene {sceneNumber}
       </div>
       {shots}
       <button onClick={addShot}>
