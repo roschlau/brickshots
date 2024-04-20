@@ -8,8 +8,12 @@ function App() {
   const [project, setProject] = useState(loadProject())
   useEffect(() => localStorage.setItem('project', JSON.stringify(project)), [project])
   const scenes = project.scenes.map((scene, sceneIndex) => {
-    function updateScene(updatedScene: SceneData) {
+    const updateScene = (updatedScene: SceneData) => {
       setProject({...project, scenes: project.scenes.map((oldScene, i) => i === sceneIndex ? updatedScene : oldScene)})
+    }
+
+    const deleteScene = () => {
+      setProject({...project, scenes: project.scenes.filter((_, i) => i !== sceneIndex)})
     }
 
     return (
@@ -18,6 +22,7 @@ function App() {
         scene={scene}
         sceneIndex={sceneIndex}
         onUpdate={updateScene}
+        onDelete={deleteScene}
       />
     )
   })
@@ -28,9 +33,9 @@ function App() {
     <>
       <DevBar onResetProject={resetProject} onBackupProject={backupProject}/>
       <h1 className="text-3xl mb-4">{project.name}</h1>
-      <div className="grid gap-2 justify-items-start items-baseline">
+      <div className="grid gap-x-2 justify-items-start items-baseline">
         {scenes}
-        <button className={'col-start-1'} onClick={addScene}>
+        <button className={'col-start-1 p-2 text-slate-300 hover:text-slate-100'} onClick={addScene}>
           + Add Scene
         </button>
       </div>
@@ -54,10 +59,11 @@ function DevBar({onResetProject, onBackupProject}: {
   )
 }
 
-function SceneTableRows({scene, sceneIndex, onUpdate}: {
+function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
   scene: SceneData,
   sceneIndex: number,
-  onUpdate: (scene: SceneData) => void
+  onUpdate: (scene: SceneData) => void,
+  onDelete: () => void,
 }) {
   const lockedShotNumbers = scene.shots.map(it => it.lockedNumber).filter((it): it is number => it !== null)
   const shotNumbers: Record<number, number> = {}
@@ -92,11 +98,18 @@ function SceneTableRows({scene, sceneIndex, onUpdate}: {
   const addShot = () => onUpdate({...scene, shots: [...scene.shots, blankShot()]})
   return (
     <>
-      <div className="col-start-1 col-span-5 mt-4 font-bold text-lg">
-        Scene {sceneNumber}
+      <div className="col-start-1 col-span-5 mt-4 flex flex-row gap-2 items-baseline">
+        <span className={'font-bold text-lg grow'}>
+          Scene {sceneNumber}
+        </span>
+        <button
+          className={'p-2 text-sm text-slate-500 hover:text-red-600'}
+          onClick={onDelete}>
+          Delete
+        </button>
       </div>
       {shots}
-      <button className={'col-start-1'} onClick={addShot}>
+      <button className={'col-start-1 p-2 text-slate-300 hover:text-slate-100'} onClick={addShot}>
         + Add Shot
       </button>
     </>
@@ -142,10 +155,15 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
   return (
     <>
       <div
-        className={'col-start-1 text-sm cursor-pointer ' + ((shot.lockedNumber != null) ? 'text-slate-100' : 'text-slate-500')}
+        className={'col-start-1'}
         onClick={shotCodeClicked}
       >
-        {shotFullCode}
+        <button
+          onClick={onDelete}
+          className={'p-2 text-sm hover:text-slate-100 ' + ((shot.lockedNumber != null) ? 'text-slate-300' : 'text-slate-500')}
+        >
+          {shotFullCode}
+        </button>
       </div>
       <div className="col-start-2">
         <input
@@ -178,6 +196,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
       <div className="col-start-6">
         <button
           onClick={onDelete}
+          className={'p-2 text-sm text-slate-500 hover:text-red-600'}
         >
           Delete
         </button>
