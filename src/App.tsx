@@ -34,7 +34,7 @@ function App() {
       <DevBar onResetProject={resetProject} onBackupProject={backupProject}/>
       <h1 className="text-3xl mb-4">{project.name}</h1>
       <div
-        className="w-full max-w-screen-lg grid gap-x-2 justify-stretch justify-items-stretch items-baseline"
+        className="w-full max-w-screen-lg grid gap-x-2 justify-stretch justify-items-stretch items-center"
         style={{gridTemplateColumns: 'auto auto auto 1fr 1fr auto'}}
       >
         {scenes}
@@ -179,27 +179,28 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
         </button>
       </div>
       <div className="col-start-3">
-        <input
-          type={'text'}
+        <textarea
+          className={'p-1 text-sm text-slate-200'}
+          rows={1}
           value={shot.location ?? ''}
           onChange={value => onUpdate({...shot, location: value.target.value})}
         />
       </div>
       <div className="col-start-4">
         <textarea
-          className={'w-full'}
+          className={'w-full p-1 text-sm text-slate-200'}
           rows={1}
           value={shot.description}
           onChange={value => onUpdate({...shot, description: value.target.value})}
-        ></textarea>
+        />
       </div>
       <div className="col-start-5">
         <textarea
-          className={'w-full'}
+          className={'w-full p-1 text-sm text-slate-200'}
           rows={1}
           value={shot.notes}
           onChange={value => onUpdate({...shot, notes: value.target.value})}
-        ></textarea>
+        />
       </div>
       <div className="col-start-6">
         <button
