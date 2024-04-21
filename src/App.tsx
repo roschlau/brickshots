@@ -34,13 +34,15 @@ function App() {
       <DevBar onResetProject={resetProject} onBackupProject={backupProject}/>
       <h1 className="text-3xl mb-4">{project.name}</h1>
       <div
-        className="w-full max-w-screen-lg grid gap-x-2 justify-stretch justify-items-stretch items-center"
+        className="w-full max-w-screen-lg grid p-[1px] gap-[1px] bg-slate-800 *:bg-slate-900 justify-stretch justify-items-stretch items-stretch"
         style={{gridTemplateColumns: 'auto auto auto 1fr 1fr auto'}}
       >
         {scenes}
-        <button className={'col-start-1 col-span-full justify-self-start p-2 text-slate-300 hover:text-slate-100'} onClick={addScene}>
-          + Add Scene
-        </button>
+        <div className={'col-start-1 col-span-full flex flex-row'}>
+          <button className={'justify-self-start p-2 text-slate-300 hover:text-slate-100'} onClick={addScene}>
+            + Add Scene
+          </button>
+        </div>
       </div>
     </>
   )
@@ -104,7 +106,7 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
   }
   return (
     <>
-      <div className="col-start-1 col-span-full mt-4 flex flex-row gap-2 items-baseline">
+      <div className="col-start-1 col-span-full p-1 pt-4 pr-0 flex flex-row gap-2 items-baseline">
         <span className={'font-bold text-lg grow'}>
           Scene {sceneNumber}
         </span>
@@ -115,9 +117,11 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
         </button>
       </div>
       {shots}
-      <button className={'col-start-1 col-span-full justify-self-start p-2 text-slate-300 hover:text-slate-100'} onClick={addShot}>
-        + Add Shot
-      </button>
+      <div className={'col-start-1 col-span-full flex flex-row'}>
+        <button className={'p-2 text-slate-300 hover:text-slate-100'} onClick={addShot}>
+          + Add Shot
+        </button>
+      </div>
     </>
   )
 }
@@ -130,6 +134,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
   onDelete: () => void,
 }) {
   const shotFullCode = shotCode(sceneNumber, shotNumber)
+  const [editing, setEditing] = useState<null | 'location' | 'description' | 'notes'>()
 
   const shotCodeClicked = () => {
     if (shot.lockedNumber === null) {
@@ -160,17 +165,13 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
 
   return (
     <>
-      <div className="col-start-1">
+      <div className="col-start-1 grid grid-flow-col place-content-start items-center px-1">
         <input
           type={'checkbox'}
+          className={'cursor-pointer'}
           checked={shot.animated}
           onChange={value => setAnimated(value.target.checked)}
         />
-      </div>
-      <div
-        className={'col-start-2'}
-        onClick={shotCodeClicked}
-      >
         <button
           onClick={shotCodeClicked}
           className={'p-2 text-sm hover:text-slate-100 ' + ((shot.lockedNumber != null) ? 'text-slate-300' : 'text-slate-500')}
@@ -178,29 +179,59 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
           {shotFullCode}
         </button>
       </div>
-      <div className="col-start-3">
-        <textarea
-          className={'p-1 text-sm text-slate-200'}
-          rows={1}
-          value={shot.location ?? ''}
-          onChange={value => onUpdate({...shot, location: value.target.value})}
-        />
+      <div className="col-start-3 self-stretch relative">
+        <div
+          className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200'}
+          onClick={() => setEditing('location')}
+        >
+          {shot.location}
+        </div>
+        { editing === 'location' ?
+          <textarea
+            className={'absolute z-10 top-0 left-0 size-full p-1 text-sm text-slate-200'}
+            autoFocus
+            value={shot.location ?? ''}
+            onChange={value => onUpdate({...shot, location: value.target.value})}
+            onBlur={() => setEditing(null)}
+            onKeyDown={event => event.key === 'Escape' ? setEditing(null) : ''}
+          /> : ''
+        }
       </div>
-      <div className="col-start-4">
-        <textarea
-          className={'w-full p-1 text-sm text-slate-200'}
-          rows={1}
-          value={shot.description}
-          onChange={value => onUpdate({...shot, description: value.target.value})}
-        />
+      <div className="col-start-4 self-stretch relative">
+        <div
+          className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200'}
+          onClick={() => setEditing('description')}
+        >
+          {shot.description}
+        </div>
+        { editing === 'description' ?
+          <textarea
+            className={'absolute z-10 top-0 left-0 size-full p-1 text-sm text-slate-200'}
+            autoFocus
+            value={shot.description}
+            onChange={value => onUpdate({...shot, description: value.target.value})}
+            onBlur={() => setEditing(null)}
+            onKeyDown={event => event.key === 'Escape' ? setEditing(null) : ''}
+          /> : ''
+        }
       </div>
-      <div className="col-start-5">
-        <textarea
-          className={'w-full p-1 text-sm text-slate-200'}
-          rows={1}
-          value={shot.notes}
-          onChange={value => onUpdate({...shot, notes: value.target.value})}
-        />
+      <div className="col-start-5 self-stretch relative">
+        <div
+          className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200'}
+          onClick={() => setEditing('notes')}
+        >
+          {shot.notes}
+        </div>
+        { editing === 'notes' ?
+          <textarea
+            className={'absolute z-10 top-0 left-0 size-full p-1 text-sm text-slate-200'}
+            autoFocus
+            value={shot.notes}
+            onChange={value => onUpdate({...shot, notes: value.target.value})}
+            onBlur={() => setEditing(null)}
+            onKeyDown={event => event.key === 'Escape' ? setEditing(null) : ''}
+          /> : ''
+        }
       </div>
       <div className="col-start-6">
         <button
