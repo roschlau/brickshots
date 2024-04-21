@@ -32,7 +32,9 @@ function App() {
   return (
     <>
       <DevBar onResetProject={resetProject} onBackupProject={backupProject}/>
-      <h1 className="text-3xl my-4">{project.name}</h1>
+      <h1 className="text-3xl my-4">
+        BrickShots
+      </h1>
       <div
         className="w-full max-w-screen-lg grid mb-10
                    justify-stretch justify-items-stretch items-stretch

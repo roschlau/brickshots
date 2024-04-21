@@ -8,7 +8,6 @@ export function loadProject(): ProjectData {
 
 export function dummyProject(): ProjectData {
   return {
-    name: 'Dummy Project',
     scenes: [
       {
         lockedNumber: null,
@@ -53,7 +52,6 @@ export function dummyProject(): ProjectData {
 }
 
 export interface ProjectData {
-  name: string
   scenes: SceneData[]
 }
 
