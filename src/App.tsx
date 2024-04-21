@@ -157,8 +157,15 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
 
   return (
     <>
+      <div className="col-start-1">
+        <input
+          type={'checkbox'}
+          checked={shot.animated}
+          onChange={value => setAnimated(value.target.checked)}
+        />
+      </div>
       <div
-        className={'col-start-1'}
+        className={'col-start-2'}
         onClick={shotCodeClicked}
       >
         <button
@@ -168,33 +175,26 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
           {shotFullCode}
         </button>
       </div>
-      <div className="col-start-2">
+      <div className="col-start-3">
         <input
           type={'text'}
           value={shot.location ?? ''}
           onChange={value => onUpdate({...shot, location: value.target.value})}
         />
       </div>
-      <div className="col-start-3">
+      <div className="col-start-4">
         <textarea
           rows={1}
           value={shot.description}
           onChange={value => onUpdate({...shot, description: value.target.value})}
         ></textarea>
       </div>
-      <div className="col-start-4">
+      <div className="col-start-5">
         <textarea
           rows={1}
           value={shot.notes}
           onChange={value => onUpdate({...shot, notes: value.target.value})}
         ></textarea>
-      </div>
-      <div className="col-start-5">
-        <input
-          type={'checkbox'}
-          checked={shot.animated}
-          onChange={value => setAnimated(value.target.checked)}
-        />
       </div>
       <div className="col-start-6">
         <button
