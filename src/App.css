@@ -1,0 +1,11 @@
+.material-symbols-rounded {
+    font-variation-settings: 'FILL' var(--icon-fill, 0),
+    'wght' var(--icon-weight, 200),
+    'GRAD' var(--icon-grad, 0),
+    'opsz' var(--icon-opsz, 24)
+}
+
+.material-symbols-rounded.icon-size-20 {
+    font-size: 20px;
+    --icon-opsz: 20
+}
