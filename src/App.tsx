@@ -33,9 +33,12 @@ function App() {
     <>
       <DevBar onResetProject={resetProject} onBackupProject={backupProject}/>
       <h1 className="text-3xl mb-4">{project.name}</h1>
-      <div className="grid gap-x-2 justify-items-start items-baseline">
+      <div
+        className="w-full max-w-screen-lg grid gap-x-2 justify-stretch justify-items-stretch items-baseline"
+        style={{gridTemplateColumns: 'auto auto auto 1fr 1fr auto'}}
+      >
         {scenes}
-        <button className={'col-start-1 col-span-5 p-2 text-slate-300 hover:text-slate-100'} onClick={addScene}>
+        <button className={'col-start-1 col-span-full justify-self-start p-2 text-slate-300 hover:text-slate-100'} onClick={addScene}>
           + Add Scene
         </button>
       </div>
@@ -101,7 +104,7 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
   }
   return (
     <>
-      <div className="col-start-1 col-span-5 mt-4 flex flex-row gap-2 items-baseline">
+      <div className="col-start-1 col-span-full mt-4 flex flex-row gap-2 items-baseline">
         <span className={'font-bold text-lg grow'}>
           Scene {sceneNumber}
         </span>
@@ -112,7 +115,7 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
         </button>
       </div>
       {shots}
-      <button className={'col-start-1 col-span-5 p-2 text-slate-300 hover:text-slate-100'} onClick={addShot}>
+      <button className={'col-start-1 col-span-full justify-self-start p-2 text-slate-300 hover:text-slate-100'} onClick={addShot}>
         + Add Shot
       </button>
     </>
@@ -184,6 +187,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
       </div>
       <div className="col-start-4">
         <textarea
+          className={'w-full'}
           rows={1}
           value={shot.description}
           onChange={value => onUpdate({...shot, description: value.target.value})}
@@ -191,6 +195,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
       </div>
       <div className="col-start-5">
         <textarea
+          className={'w-full'}
           rows={1}
           value={shot.notes}
           onChange={value => onUpdate({...shot, notes: value.target.value})}
