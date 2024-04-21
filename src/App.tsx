@@ -1,18 +1,25 @@
 import {useEffect, useState} from 'react'
 import './App.css'
-import {blankScene, dummyProject, loadProject, newShot, SceneData, ShotData} from './persistence.ts'
+import {newScene, newProject, loadProject, newShot, SceneData, ShotData} from './persistence.ts'
 import clipboard from 'clipboardy'
 import {getSceneNumber, nextShotAutoNumber, shotCode} from './codes.ts'
 
 function App() {
   const [project, setProject] = useState(loadProject())
   useEffect(() => localStorage.setItem('project', JSON.stringify(project)), [project])
+  const backupProject = (reason: string) => localStorage.setItem('backup-' + new Date().toISOString() + '-' + reason, JSON.stringify(project))
+  const resetProject = () => {
+    backupProject('before-new-project')
+    setProject(newProject)
+  }
+  const addScene = () => setProject({...project, scenes: [...project.scenes, newScene()]})
   const scenes = project.scenes.map((scene, sceneIndex) => {
     const updateScene = (updatedScene: SceneData) => {
       setProject({...project, scenes: project.scenes.map((oldScene, i) => i === sceneIndex ? updatedScene : oldScene)})
     }
 
     const deleteScene = () => {
+      backupProject('before-scene-deletion')
       setProject({...project, scenes: project.scenes.filter((_, i) => i !== sceneIndex)})
     }
 
@@ -23,12 +30,10 @@ function App() {
         sceneIndex={sceneIndex}
         onUpdate={updateScene}
         onDelete={deleteScene}
+        backupProject={backupProject}
       />
     )
   })
-  const resetProject = () => setProject(dummyProject)
-  const backupProject = () => localStorage.setItem('backup-' + new Date().toISOString(), JSON.stringify(project))
-  const addScene = () => setProject({...project, scenes: [...project.scenes, blankScene()]})
   return (
     <>
       <DevBar onResetProject={resetProject} onBackupProject={backupProject}/>
@@ -54,25 +59,26 @@ function App() {
 
 function DevBar({onResetProject, onBackupProject}: {
   onResetProject: () => void,
-  onBackupProject: () => void
+  onBackupProject: (reason: string) => void
 }) {
   return (
     <div className={'absolute top-0 right-0 flex flex-row'}>
-      <button className={'p-2'} onClick={onBackupProject}>
-        Backup
+      <button className={'p-2'} onClick={() => onBackupProject('manual')}>
+        Backup Project
       </button>
       <button className={'p-2'} onClick={onResetProject}>
-        Reset
+        New Project
       </button>
     </div>
   )
 }
 
-function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
+function SceneTableRows({scene, sceneIndex, onUpdate, onDelete, backupProject}: {
   scene: SceneData,
   sceneIndex: number,
   onUpdate: (scene: SceneData) => void,
   onDelete: () => void,
+  backupProject: (reason: string) => void,
 }) {
   const lockedShotNumbers = scene.shots.map(it => it.lockedNumber).filter((it): it is number => it !== null)
   const shotNumbers: Record<number, number> = {}
@@ -86,6 +92,7 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
       })
     }
     const deleteShot = () => {
+      backupProject('before-shot-deletion')
       onUpdate({
         ...scene,
         shots: scene.shots.filter((_, i) => i !== shotIndex),

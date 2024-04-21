@@ -3,56 +3,17 @@ export function loadProject(): ProjectData {
   if (existing) {
     return JSON.parse(existing) as ProjectData
   }
-  return dummyProject()
-}
-
-export function dummyProject(): ProjectData {
-  return {
-    scenes: [
-      {
-        lockedNumber: null,
-        shots: [
-          {
-            lockedNumber: null,
-            description: 'Shot 1',
-            notes: 'Some Notes',
-            animated: true,
-            location: 'Int. Garden',
-          },
-          {
-            lockedNumber: null,
-            description: 'Shot 2',
-            notes: '',
-            animated: false,
-            location: 'Ext. House',
-          },
-        ],
-      },
-      {
-        lockedNumber: null,
-        shots: [
-          {
-            lockedNumber: null,
-            description: 'Shot 1',
-            notes: 'More Notes',
-            animated: true,
-            location: 'Int. Garden',
-          },
-          {
-            lockedNumber: null,
-            description: 'Shot 2',
-            notes: '',
-            animated: false,
-            location: 'Ext. House',
-          },
-        ],
-      },
-    ],
-  }
+  return newProject()
 }
 
 export interface ProjectData {
   scenes: SceneData[]
+}
+
+export function newProject(): ProjectData {
+  return {
+    scenes: [],
+  }
 }
 
 export interface SceneData {
@@ -60,7 +21,7 @@ export interface SceneData {
   shots: ShotData[]
 }
 
-export function blankScene(): SceneData {
+export function newScene(): SceneData {
   return {
     lockedNumber: null,
     shots: [],
