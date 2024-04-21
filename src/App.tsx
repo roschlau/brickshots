@@ -216,7 +216,7 @@ function EditableTextCell({column, value, onUpdate}: {
 }) {
   const [editing, setEditing] = useState(false)
   return (
-    <div className={column + ' self-stretch relative'}>
+    <div className={column + ' self-stretch relative'} tabIndex={editing ? undefined : 0} onFocus={() => setEditing(true)}>
       <div
         className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200 hover:text-slate-100 hover:bg-slate-700'}
         onClick={() => setEditing(true)}
