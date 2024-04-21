@@ -1,30 +1,28 @@
-# React + TypeScript + Vite
+# Brickshots
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is simple shotlist manager I use for planning and keeping track of the shots I need to animate for my brickfilms.
 
-Currently, two official plugins are available:
+Core features:
+- List of shots divided into scenes
+- Automatic generation of a shotcode based on its position in the scene and the other shots around it
+- Manual locking/setting of shotcodes for shots that have been animated, with generated codes automatically adjusting
+- Keeping track of location, description, notes and animation status per shot
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Development
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+Starting the dev server:
+```shell
+bun run dev
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Running the tests:
+```shell
+bun test --watch
+```
+This will re-run the tests automatically with every file change. If you don't want that behavior, remove the `--watch`
+argument.
+
+Build for deployment:
+```shell
+bun run build
+```
