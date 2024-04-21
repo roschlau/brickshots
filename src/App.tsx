@@ -43,7 +43,7 @@ function App() {
       >
         {scenes}
         <button
-          className={'col-start-1 col-span-full text-start p-2 text-slate-300 hover:text-slate-100 hover:bg-slate-800'}
+          className={'col-start-1 col-span-full mt-4 rounded-md text-start p-2 text-slate-300 hover:text-slate-100 hover:bg-slate-700'}
           onClick={addScene}>
           + Add Scene
         </button>
@@ -110,7 +110,7 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
   }
   return (
     <>
-      <div className="col-start-1 col-span-full p-1 pt-4 pr-0 flex flex-row gap-2 items-baseline">
+      <div className="col-start-1 col-span-full rounded-t-md mt-4 p-1 pl-3 pr-0 flex flex-row gap-2 items-baseline">
         <span className={'font-bold text-lg grow'}>
           Scene {sceneNumber}
         </span>
@@ -122,7 +122,7 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
       </div>
       {shots}
       <button
-        className={'col-start-1 col-span-full text-start p-2 text-slate-300 hover:text-slate-100 hover:bg-slate-800'}
+        className={'col-start-1 col-span-full rounded-b-md p-2 pb-3 text-start text-slate-300 hover:text-slate-100 hover:bg-slate-700'}
         onClick={addShot}>
         + Add Shot
       </button>
@@ -168,7 +168,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
 
   return (
     <>
-      <div className="col-start-1 grid grid-flow-col place-content-start items-center px-1">
+      <div className="col-start-1 grid grid-flow-col place-content-start items-center pl-2">
         <input
           type={'checkbox'}
           className={'cursor-pointer'}
@@ -218,7 +218,7 @@ function EditableTextCell({column, value, onUpdate}: {
   return (
     <div className={column + ' self-stretch relative'}>
       <div
-        className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200 hover:text-slate-100 hover:bg-slate-800'}
+        className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200 hover:text-slate-100 hover:bg-slate-700'}
         onClick={() => setEditing(true)}
       >
         {value}
