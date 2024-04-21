@@ -77,12 +77,13 @@ export interface ShotData {
   animated: boolean
 }
 
-export function blankShot(): ShotData {
+export function newShot(data?: Partial<ShotData>): ShotData {
   return {
     lockedNumber: null,
     description: '',
     location: null,
     notes: '',
     animated: false,
+    ...data,
   }
 }

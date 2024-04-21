@@ -1,8 +1,8 @@
 import {useEffect, useState} from 'react'
 import './App.css'
-import {blankScene, blankShot, dummyProject, loadProject, SceneData, ShotData} from './persistence.ts'
+import {blankScene, dummyProject, loadProject, newShot, SceneData, ShotData} from './persistence.ts'
 import clipboard from 'clipboardy'
-import {nextShotAutoNumber, getSceneNumber, shotCode} from './codes.ts'
+import {getSceneNumber, nextShotAutoNumber, shotCode} from './codes.ts'
 
 function App() {
   const [project, setProject] = useState(loadProject())
@@ -28,7 +28,7 @@ function App() {
   })
   const resetProject = () => setProject(dummyProject)
   const backupProject = () => localStorage.setItem('backup-' + new Date().toISOString(), JSON.stringify(project))
-  const addScene = () => setProject({ ...project, scenes: [...project.scenes, blankScene()] })
+  const addScene = () => setProject({...project, scenes: [...project.scenes, blankScene()]})
   return (
     <>
       <DevBar onResetProject={resetProject} onBackupProject={backupProject}/>
@@ -95,7 +95,10 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
       />
     )
   })
-  const addShot = () => onUpdate({...scene, shots: [...scene.shots, blankShot()]})
+  const addShot = () => {
+    const shot = newShot({location: scene.shots[scene.shots.length - 1]?.location})
+    onUpdate({...scene, shots: [...scene.shots, shot]})
+  }
   return (
     <>
       <div className="col-start-1 col-span-5 mt-4 flex flex-row gap-2 items-baseline">
@@ -149,7 +152,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
   }
 
   const setAnimated = (animated: boolean) => {
-    onUpdate({...shot, animated, lockedNumber: animated && shot.lockedNumber === null ? shotNumber : shot.lockedNumber })
+    onUpdate({...shot, animated, lockedNumber: animated && shot.lockedNumber === null ? shotNumber : shot.lockedNumber})
   }
 
   return (
