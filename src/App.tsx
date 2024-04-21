@@ -34,12 +34,28 @@ function App() {
       />
     )
   })
+  const sceneLinks = project.scenes.map((scene, sceneIndex) => {
+    const sceneNumber = getSceneNumber(scene, sceneIndex)
+    return (
+      <a
+        key={sceneNumber}
+        href={'#scene-' + sceneNumber.toString()}
+        className={'p-1'}
+      >
+        {sceneNumber}
+      </a>
+    )
+  })
   return (
     <>
       <DevBar onResetProject={resetProject} onBackupProject={backupProject}/>
       <h1 className="text-3xl my-4">
         BrickShots
       </h1>
+      <div className={'flex flex-row items-center'}>
+        Scenes:
+        {sceneLinks}
+      </div>
       <div
         className="w-full max-w-screen-lg grid mb-10
                    justify-stretch justify-items-stretch items-stretch
@@ -117,7 +133,10 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete, backupProject}: 
   }
   return (
     <>
-      <div className="col-start-1 col-span-full rounded-t-md mt-4 p-1 pl-3 pr-0 flex flex-row gap-2 items-baseline">
+      <div
+        id={'scene-' + sceneNumber.toString()}
+        className="col-start-1 col-span-full rounded-t-md mt-4 p-1 pl-3 pr-0 flex flex-row gap-2 items-baseline"
+      >
         <span className={'font-bold text-lg grow'}>
           Scene {sceneNumber}
         </span>
