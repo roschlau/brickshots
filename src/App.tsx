@@ -1,8 +1,9 @@
 import {useEffect, useState} from 'react'
 import './App.css'
-import {newScene, newProject, loadProject, newShot, SceneData, ShotData} from './persistence.ts'
+import {loadProject, newProject, newScene, newShot, SceneData, ShotData} from './persistence.ts'
 import clipboard from 'clipboardy'
 import {getSceneNumber, nextShotAutoNumber, shotCode} from './codes.ts'
+import {Icon} from './Icon.tsx'
 
 function App() {
   const [project, setProject] = useState(loadProject())
@@ -165,26 +166,31 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
 }) {
   const shotFullCode = shotCode(sceneNumber, shotNumber)
 
-  const shotCodeClicked = () => {
+  const lockAndCopyShotCode = () => {
     if (shot.lockedNumber === null) {
       onUpdate({...shot, lockedNumber: shotNumber})
-      void clipboard.write(shotFullCode)
-    } else {
-      const newShotCode = window.prompt('Change locked shot code to:', shot.lockedNumber.toString())
-      if (newShotCode !== null) {
-        if (newShotCode.trim().length === 0) {
-          onUpdate({...shot, lockedNumber: null})
-          return
-        }
-        const parsed = parseInt(newShotCode)
-        if (isNaN(parsed)) {
-          throw Error('Invalid shotcode: ' + newShotCode)
-        }
-        if (parsed !== shot.lockedNumber) {
-          onUpdate({...shot, lockedNumber: parsed})
-        }
-        void clipboard.write(sceneNumber.toString() + '-' + parsed.toString())
+    }
+    void clipboard.write(shotFullCode)
+  }
+
+  const editShotCode = () => {
+    if (shot.lockedNumber === null) {
+      throw Error('Shotcode not locked')
+    }
+    const newShotCode = window.prompt('Change locked shot code to:', shot.lockedNumber.toString())
+    if (newShotCode !== null) {
+      if (newShotCode.trim().length === 0) {
+        onUpdate({...shot, lockedNumber: null})
+        return
       }
+      const parsed = parseInt(newShotCode)
+      if (isNaN(parsed)) {
+        throw Error('Invalid shotcode: ' + newShotCode)
+      }
+      if (parsed !== shot.lockedNumber) {
+        onUpdate({...shot, lockedNumber: parsed})
+      }
+      void clipboard.write(sceneNumber.toString() + '-' + parsed.toString())
     }
   }
 
@@ -194,7 +200,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
 
   return (
     <>
-      <div className="col-start-1 grid grid-flow-col place-content-start items-center pl-2">
+      <div className="col-start-1 grid grid-flow-col place-content-start items-center pl-2 group">
         <input
           type={'checkbox'}
           className={'cursor-pointer'}
@@ -202,11 +208,28 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
           onChange={value => setAnimated(value.target.checked)}
         />
         <button
-          onClick={shotCodeClicked}
-          className={'p-2 text-sm hover:text-slate-100 ' + ((shot.lockedNumber != null) ? 'text-slate-300' : 'text-slate-500')}
+          onClick={lockAndCopyShotCode}
+          className={'p-2 pr-0 text-sm flex flex-row items-center ' + ((shot.lockedNumber != null) ? 'text-slate-300 hover:text-slate-100' : 'text-slate-500 hover:text-slate-100')}
         >
           {shotFullCode}
+          {shot.lockedNumber === null &&
+              <Icon
+                  code={'lock'}
+                  className={'icon-size-20 opacity-0 group-hover:opacity-100 pl-1'}
+              />
+          }
         </button>
+        {shot.lockedNumber !== null &&
+            <button
+                onClick={editShotCode}
+                className={'p-2 pl-1 flex flex-row items-center opacity-0 group-hover:opacity-100'}
+            >
+                <Icon
+                    code={'edit'}
+                    className={'icon-size-20 text-slate-500 hover:text-slate-100'}
+                />
+            </button>
+        }
       </div>
       <EditableTextCell
         column={'col-start-3'}
@@ -242,7 +265,8 @@ function EditableTextCell({column, value, onUpdate}: {
 }) {
   const [editing, setEditing] = useState(false)
   return (
-    <div className={column + ' self-stretch relative'} tabIndex={editing ? undefined : 0} onFocus={() => setEditing(true)}>
+    <div className={column + ' self-stretch relative'} tabIndex={editing ? undefined : 0}
+         onFocus={() => setEditing(true)}>
       <div
         className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200 hover:text-slate-100 hover:bg-slate-700'}
         onClick={() => setEditing(true)}
