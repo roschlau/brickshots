@@ -172,7 +172,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
         onClick={shotCodeClicked}
       >
         <button
-          onClick={onDelete}
+          onClick={shotCodeClicked}
           className={'p-2 text-sm hover:text-slate-100 ' + ((shot.lockedNumber != null) ? 'text-slate-300' : 'text-slate-500')}
         >
           {shotFullCode}
