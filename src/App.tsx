@@ -40,7 +40,9 @@ function App() {
         style={{gridTemplateColumns: 'auto auto auto 1fr 1fr auto'}}
       >
         {scenes}
-        <button className={'col-start-1 col-span-full text-start p-2 text-slate-300 hover:text-slate-100 hover:bg-slate-800'} onClick={addScene}>
+        <button
+          className={'col-start-1 col-span-full text-start p-2 text-slate-300 hover:text-slate-100 hover:bg-slate-800'}
+          onClick={addScene}>
           + Add Scene
         </button>
       </div>
@@ -117,7 +119,9 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
         </button>
       </div>
       {shots}
-      <button className={'col-start-1 col-span-full text-start p-2 text-slate-300 hover:text-slate-100 hover:bg-slate-800'} onClick={addShot}>
+      <button
+        className={'col-start-1 col-span-full text-start p-2 text-slate-300 hover:text-slate-100 hover:bg-slate-800'}
+        onClick={addShot}>
         + Add Shot
       </button>
     </>
@@ -132,7 +136,6 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
   onDelete: () => void,
 }) {
   const shotFullCode = shotCode(sceneNumber, shotNumber)
-  const [editing, setEditing] = useState<null | 'location' | 'description' | 'notes'>()
 
   const shotCodeClicked = () => {
     if (shot.lockedNumber === null) {
@@ -177,60 +180,21 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
           {shotFullCode}
         </button>
       </div>
-      <div className="col-start-3 self-stretch relative">
-        <div
-          className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200 hover:text-slate-100 hover:bg-slate-800'}
-          onClick={() => setEditing('location')}
-        >
-          {shot.location}
-        </div>
-        { editing === 'location' ?
-          <textarea
-            className={'absolute z-10 top-0 left-0 size-full p-1 text-sm text-slate-200'}
-            autoFocus
-            value={shot.location ?? ''}
-            onChange={value => onUpdate({...shot, location: value.target.value})}
-            onBlur={() => setEditing(null)}
-            onKeyDown={event => event.key === 'Escape' ? setEditing(null) : ''}
-          /> : ''
-        }
-      </div>
-      <div className="col-start-4 self-stretch relative">
-        <div
-          className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200 hover:text-slate-100 hover:bg-slate-800'}
-          onClick={() => setEditing('description')}
-        >
-          {shot.description}
-        </div>
-        { editing === 'description' ?
-          <textarea
-            className={'absolute z-10 top-0 left-0 size-full p-1 text-sm text-slate-200'}
-            autoFocus
-            value={shot.description}
-            onChange={value => onUpdate({...shot, description: value.target.value})}
-            onBlur={() => setEditing(null)}
-            onKeyDown={event => event.key === 'Escape' ? setEditing(null) : ''}
-          /> : ''
-        }
-      </div>
-      <div className="col-start-5 self-stretch relative">
-        <div
-          className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200 hover:text-slate-100 hover:bg-slate-800'}
-          onClick={() => setEditing('notes')}
-        >
-          {shot.notes}
-        </div>
-        { editing === 'notes' ?
-          <textarea
-            className={'absolute z-10 top-0 left-0 size-full p-1 text-sm text-slate-200'}
-            autoFocus
-            value={shot.notes}
-            onChange={value => onUpdate({...shot, notes: value.target.value})}
-            onBlur={() => setEditing(null)}
-            onKeyDown={event => event.key === 'Escape' ? setEditing(null) : ''}
-          /> : ''
-        }
-      </div>
+      <EditableTextCell
+        column={'col-start-3'}
+        value={shot.location ?? ''}
+        onUpdate={value => onUpdate({...shot, location: value.trim() === '' ? null : value})}
+      />
+      <EditableTextCell
+        column={'col-start-4'}
+        value={shot.description}
+        onUpdate={value => onUpdate({...shot, description: value})}
+      />
+      <EditableTextCell
+        column={'col-start-5'}
+        value={shot.notes}
+        onUpdate={value => onUpdate({...shot, notes: value})}
+      />
       <div className="col-start-6">
         <button
           onClick={onDelete}
@@ -240,6 +204,34 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
         </button>
       </div>
     </>
+  )
+}
+
+function EditableTextCell({column, value, onUpdate}: {
+  column: string,
+  value: string,
+  onUpdate: (value: string) => void
+}) {
+  const [editing, setEditing] = useState(false)
+  return (
+    <div className={column + ' self-stretch relative'}>
+      <div
+        className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200 hover:text-slate-100 hover:bg-slate-800'}
+        onClick={() => setEditing(true)}
+      >
+        {value}
+      </div>
+      {editing ?
+        <textarea
+          className={'absolute z-10 top-0 left-0 size-full p-1 text-sm text-slate-200'}
+          autoFocus
+          value={value}
+          onChange={event => onUpdate(event.target.value)}
+          onBlur={() => setEditing(false)}
+          onKeyDown={event => event.key === 'Escape' ? setEditing(false) : ''}
+        /> : ''
+      }
+    </div>
   )
 }
 
