@@ -35,7 +35,7 @@ function App() {
       <h1 className="text-3xl mb-4">{project.name}</h1>
       <div className="grid gap-x-2 justify-items-start items-baseline">
         {scenes}
-        <button className={'col-start-1 p-2 text-slate-300 hover:text-slate-100'} onClick={addScene}>
+        <button className={'col-start-1 col-span-5 p-2 text-slate-300 hover:text-slate-100'} onClick={addScene}>
           + Add Scene
         </button>
       </div>
@@ -112,7 +112,7 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
         </button>
       </div>
       {shots}
-      <button className={'col-start-1 p-2 text-slate-300 hover:text-slate-100'} onClick={addShot}>
+      <button className={'col-start-1 col-span-5 p-2 text-slate-300 hover:text-slate-100'} onClick={addShot}>
         + Add Shot
       </button>
     </>
