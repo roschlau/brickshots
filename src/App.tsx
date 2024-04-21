@@ -32,17 +32,17 @@ function App() {
   return (
     <>
       <DevBar onResetProject={resetProject} onBackupProject={backupProject}/>
-      <h1 className="text-3xl mb-4">{project.name}</h1>
+      <h1 className="text-3xl my-4">{project.name}</h1>
       <div
-        className="w-full max-w-screen-lg grid p-[1px] gap-[1px] bg-slate-800 *:bg-slate-900 justify-stretch justify-items-stretch items-stretch"
+        className="w-full max-w-screen-lg grid mb-10
+                   justify-stretch justify-items-stretch items-stretch
+                   p-[1px] gap-[1px] bg-slate-800 *:bg-slate-900"
         style={{gridTemplateColumns: 'auto auto auto 1fr 1fr auto'}}
       >
         {scenes}
-        <div className={'col-start-1 col-span-full flex flex-row'}>
-          <button className={'justify-self-start p-2 text-slate-300 hover:text-slate-100'} onClick={addScene}>
-            + Add Scene
-          </button>
-        </div>
+        <button className={'col-start-1 col-span-full text-start p-2 text-slate-300 hover:text-slate-100 hover:bg-slate-800'} onClick={addScene}>
+          + Add Scene
+        </button>
       </div>
     </>
   )
@@ -117,11 +117,9 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete}: {
         </button>
       </div>
       {shots}
-      <div className={'col-start-1 col-span-full flex flex-row'}>
-        <button className={'p-2 text-slate-300 hover:text-slate-100'} onClick={addShot}>
-          + Add Shot
-        </button>
-      </div>
+      <button className={'col-start-1 col-span-full text-start p-2 text-slate-300 hover:text-slate-100 hover:bg-slate-800'} onClick={addShot}>
+        + Add Shot
+      </button>
     </>
   )
 }
@@ -181,7 +179,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
       </div>
       <div className="col-start-3 self-stretch relative">
         <div
-          className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200'}
+          className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200 hover:text-slate-100 hover:bg-slate-800'}
           onClick={() => setEditing('location')}
         >
           {shot.location}
@@ -199,7 +197,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
       </div>
       <div className="col-start-4 self-stretch relative">
         <div
-          className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200'}
+          className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200 hover:text-slate-100 hover:bg-slate-800'}
           onClick={() => setEditing('description')}
         >
           {shot.description}
@@ -217,7 +215,7 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
       </div>
       <div className="col-start-5 self-stretch relative">
         <div
-          className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200'}
+          className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200 hover:text-slate-100 hover:bg-slate-800'}
           onClick={() => setEditing('notes')}
         >
           {shot.notes}
