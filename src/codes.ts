@@ -15,7 +15,7 @@ export function nextShotAutoNumber(previous: number, lockedNumbers: number[]): n
     return base
   }
   if (nextLocked === previous + 1) {
-    throw Error('No space left between previous and next locked number')
+    return nextShotAutoNumber(nextLocked, lockedNumbers)
   }
   return previous + Math.floor((nextLocked - previous) / 2)
 }

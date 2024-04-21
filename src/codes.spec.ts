@@ -59,4 +59,10 @@ describe('nextElementAutoNumber(previous, allLocked)', () => {
     expect(nextShotAutoNumber(10, [13]))
       .toBe(11)
   })
+  it('should jump ahead if `previous` directly precedes a locked number', () => {
+    expect(nextShotAutoNumber(10, [11]))
+      .toBe(20)
+    expect(nextShotAutoNumber(10, [11, 20]))
+      .toBe(15)
+  })
 })
