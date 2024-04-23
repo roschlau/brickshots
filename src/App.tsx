@@ -115,6 +115,22 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete, backupProject}: 
         shots: scene.shots.filter((_, i) => i !== shotIndex),
       })
     }
+    const swapWithNext = () => {
+      const current = scene.shots[shotIndex]
+      const next = scene.shots[shotIndex + 1]
+      if (current === undefined || next === undefined) {
+        throw Error()
+      }
+      onUpdate({
+        ...scene,
+        shots: scene.shots.map((shot, i) =>
+          i === shotIndex
+            ? next
+            : i === shotIndex + 1
+              ? current
+              : shot),
+      })
+    }
     const shotNumber = shot.lockedNumber ?? nextShotAutoNumber(shotNumbers[shotIndex - 1] ?? 0, lockedShotNumbers)
     shotNumbers[shotIndex] = shotNumber
     return (
@@ -123,8 +139,10 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete, backupProject}: 
         shot={shot}
         sceneNumber={sceneNumber}
         shotNumber={shotNumber}
+        showSwapButton={shotIndex < (scene.shots.length - 1)}
         onUpdate={updateShot}
         onDelete={deleteShot}
+        onSwapWithNext={swapWithNext}
       />
     )
   })
@@ -157,12 +175,14 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete, backupProject}: 
   )
 }
 
-function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
+function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, onDelete, onSwapWithNext}: {
   shot: ShotData,
   sceneNumber: number,
   shotNumber: number,
+  showSwapButton: boolean,
   onUpdate: (shot: ShotData) => void,
   onDelete: () => void,
+  onSwapWithNext: () => void,
 }) {
   const shotFullCode = shotCode(sceneNumber, shotNumber)
 
@@ -200,7 +220,13 @@ function ShotTableRow({shot, sceneNumber, shotNumber, onUpdate, onDelete}: {
 
   return (
     <>
-      <div className="col-start-1 grid grid-flow-col place-content-start items-center pl-2 group">
+      <div className="col-start-1 grid grid-flow-col place-content-start items-center pl-2 group relative">
+        {showSwapButton && <button
+            className={'absolute bottom-0 left-0 -translate-x-full translate-y-1/2 opacity-0 group-hover:opacity-100'}
+            onClick={onSwapWithNext}
+        >
+            <Icon code={'swap_vert'}/>
+        </button>}
         <input
           type={'checkbox'}
           className={'cursor-pointer'}

@@ -1,4 +1,5 @@
 .material-symbols-rounded {
+    display: block;
     font-variation-settings: 'FILL' var(--icon-fill, 0),
     'wght' var(--icon-weight, 200),
     'GRAD' var(--icon-grad, 0),
