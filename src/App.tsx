@@ -62,7 +62,7 @@ function App() {
         {sceneLinks}
       </div>
       <div
-        className="w-full max-w-screen-lg grid mb-10
+        className="w-full max-w-screen-xl grid mb-10
                    justify-stretch justify-items-stretch items-stretch
                    p-[1px] gap-[1px] bg-slate-800 *:bg-slate-900"
         style={{gridTemplateColumns: 'auto auto auto 1fr 1fr auto'}}
