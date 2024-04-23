@@ -100,6 +100,15 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete, backupProject}: 
   const lockedShotNumbers = scene.shots.map(it => it.lockedNumber).filter((it): it is number => it !== null)
   const shotNumbers: Record<number, number> = {}
   const sceneNumber = getSceneNumber(scene, sceneIndex)
+  const addNewShot = (index: number) => {
+    const shot = newShot({location: (scene.shots[index - 1] ?? scene.shots[index])?.location})
+    const newShots = [...scene.shots]
+    newShots.splice(index, 0, shot)
+    onUpdate({
+      ...scene,
+      shots: newShots,
+    })
+  }
   const shots = scene.shots.map((shot, shotIndex) => {
     const updateShot = (updatedShot: ShotData) => {
       onUpdate({
@@ -115,19 +124,19 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete, backupProject}: 
         shots: scene.shots.filter((_, i) => i !== shotIndex),
       })
     }
-    const swapWithNext = () => {
+    const swapWithPrevious = () => {
+      const previous = scene.shots[shotIndex - 1]
       const current = scene.shots[shotIndex]
-      const next = scene.shots[shotIndex + 1]
-      if (current === undefined || next === undefined) {
+      if (current === undefined || previous === undefined) {
         throw Error()
       }
       onUpdate({
         ...scene,
         shots: scene.shots.map((shot, i) =>
-          i === shotIndex
-            ? next
-            : i === shotIndex + 1
-              ? current
+          i === shotIndex - 1
+            ? current
+            : i === shotIndex
+              ? previous
               : shot),
       })
     }
@@ -139,17 +148,14 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete, backupProject}: 
         shot={shot}
         sceneNumber={sceneNumber}
         shotNumber={shotNumber}
-        showSwapButton={shotIndex < (scene.shots.length - 1)}
+        showSwapButton={shotIndex > 0}
         onUpdate={updateShot}
         onDelete={deleteShot}
-        onSwapWithNext={swapWithNext}
+        onAddBefore={() => addNewShot(shotIndex)}
+        onSwapWithPrevious={swapWithPrevious}
       />
     )
   })
-  const addShot = () => {
-    const shot = newShot({location: scene.shots[scene.shots.length - 1]?.location})
-    onUpdate({...scene, shots: [...scene.shots, shot]})
-  }
   return (
     <>
       <div
@@ -168,21 +174,22 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete, backupProject}: 
       {shots}
       <button
         className={'col-start-1 col-span-full rounded-b-md p-2 pb-3 text-start text-slate-300 hover:text-slate-100 hover:bg-slate-700'}
-        onClick={addShot}>
+        onClick={() => addNewShot(scene.shots.length)}>
         + Add Shot
       </button>
     </>
   )
 }
 
-function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, onDelete, onSwapWithNext}: {
+function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, onDelete, onAddBefore, onSwapWithPrevious}: {
   shot: ShotData,
   sceneNumber: number,
   shotNumber: number,
   showSwapButton: boolean,
   onUpdate: (shot: ShotData) => void,
   onDelete: () => void,
-  onSwapWithNext: () => void,
+  onAddBefore: () => void,
+  onSwapWithPrevious: () => void,
 }) {
   const shotFullCode = shotCode(sceneNumber, shotNumber)
 
@@ -221,9 +228,15 @@ function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, 
   return (
     <>
       <div className="col-start-1 grid grid-flow-col place-content-start items-center pl-2 group relative">
+        <button
+          className={'absolute top-0 left-0 -translate-x-[100%] -translate-y-1/2 opacity-0 group-hover:opacity-100'}
+          onClick={onAddBefore}
+        >
+          <Icon code={'add'}/>
+        </button>
         {showSwapButton && <button
-            className={'absolute bottom-0 left-0 -translate-x-full translate-y-1/2 opacity-0 group-hover:opacity-100'}
-            onClick={onSwapWithNext}
+            className={'absolute top-0 left-0 -translate-x-[200%] -translate-y-1/2 opacity-0 group-hover:opacity-100'}
+            onClick={onSwapWithPrevious}
         >
             <Icon code={'swap_vert'}/>
         </button>}
