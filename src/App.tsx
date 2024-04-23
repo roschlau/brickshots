@@ -8,7 +8,11 @@ import {Icon} from './Icon.tsx'
 function App() {
   const [project, setProject] = useState(loadProject())
   useEffect(() => localStorage.setItem('project', JSON.stringify(project)), [project])
-  const backupProject = (reason: string) => localStorage.setItem('backup-' + new Date().toISOString() + '-' + reason, JSON.stringify(project))
+  const backupProject = (reason: string) => {
+    const serialized = JSON.stringify(project)
+    localStorage.setItem('backup-' + new Date().toISOString() + '-' + reason, serialized)
+    void clipboard.write(serialized)
+  }
   const resetProject = () => {
     backupProject('before-new-project')
     setProject(newProject)
