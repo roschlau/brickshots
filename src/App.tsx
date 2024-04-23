@@ -290,6 +290,18 @@ function EditableTextCell({column, value, onUpdate}: {
   onUpdate: (value: string) => void
 }) {
   const [editing, setEditing] = useState(false)
+  const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    switch (event.key) {
+      case 'Escape':
+        setEditing(false)
+        break
+      case 'Enter':
+        if (!event.shiftKey) {
+          setEditing(false)
+        }
+        break
+    }
+  }
   return (
     <div className={column + ' self-stretch relative'} tabIndex={editing ? undefined : 0}
          onFocus={() => setEditing(true)}>
@@ -306,7 +318,7 @@ function EditableTextCell({column, value, onUpdate}: {
           value={value}
           onChange={event => onUpdate(event.target.value)}
           onBlur={() => setEditing(false)}
-          onKeyDown={event => event.key === 'Escape' ? setEditing(false) : ''}
+          onKeyDown={onKeyDown}
         /> : ''
       }
     </div>
