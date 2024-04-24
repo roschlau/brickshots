@@ -277,16 +277,19 @@ function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, 
       <EditableTextCell
         column={'col-start-3'}
         value={shot.location ?? ''}
+        color={shot.animated ? 'secondary' : 'primary'}
         onUpdate={value => onUpdate({...shot, location: value.trim() === '' ? null : value})}
       />
       <EditableTextCell
         column={'col-start-4'}
         value={shot.description}
+        color={shot.animated ? 'secondary' : 'primary'}
         onUpdate={value => onUpdate({...shot, description: value})}
       />
       <EditableTextCell
         column={'col-start-5'}
         value={shot.notes}
+        color={shot.animated ? 'secondary' : 'primary'}
         onUpdate={value => onUpdate({...shot, notes: value})}
       />
       <div className="col-start-6">
@@ -301,10 +304,11 @@ function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, 
   )
 }
 
-function EditableTextCell({column, value, onUpdate}: {
+function EditableTextCell({column, value, color, onUpdate}: {
   column: string,
   value: string,
-  onUpdate: (value: string) => void
+  color: 'primary' | 'secondary',
+  onUpdate: (value: string) => void,
 }) {
   const [editing, setEditing] = useState(false)
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -320,10 +324,12 @@ function EditableTextCell({column, value, onUpdate}: {
     }
   }
   return (
-    <div className={column + ' self-stretch relative'} tabIndex={editing ? undefined : 0}
-         onFocus={() => setEditing(true)}>
+    <div
+      className={column + ' self-stretch relative'} tabIndex={editing ? undefined : 0}
+      onFocus={() => setEditing(true)}
+    >
       <div
-        className={'h-full cursor-pointer p-1 whitespace-break-spaces text-sm text-slate-200 hover:text-slate-100 hover:bg-slate-700'}
+        className={`h-full cursor-pointer p-1 whitespace-break-spaces text-sm ${color === 'primary' ? 'text-slate-200' : 'text-slate-500'} hover:text-slate-100 hover:bg-slate-700`}
         onClick={() => setEditing(true)}
       >
         {value}
