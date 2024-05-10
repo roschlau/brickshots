@@ -164,22 +164,23 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete, backupProject}: 
     <>
       <div
         id={'scene-' + sceneNumber.toString()}
-        className="col-start-1 col-span-full rounded-t-md mt-4 p-0.5 pl-3 pr-0 flex flex-row gap-2 items-center"
+        className="col-start-1 col-span-full rounded-t-md mt-4 pl-3 pr-0 flex flex-row gap-2 items-center overflow-hidden"
       >
         <span className={'font-bold text-lg'}>
           #{sceneNumber}
         </span>
         <input
           type={'text'}
-          className={'grow self-stretch p-2 font-bold text-lg rounded bg-transparent border-none placeholder:font-normal'}
+          className={'grow self-stretch my-0.5 p-2 font-bold text-lg rounded bg-transparent border-none placeholder:font-normal'}
           value={scene.description}
           placeholder={'No description'}
           onChange={(event) => onUpdate({ ...scene, description: event.target.value })}
         />
         <button
-          className={'p-2 text-sm text-slate-500 hover:text-red-600'}
-          onClick={onDelete}>
-          Delete
+          className={'p-2 text-sm text-slate-500 hover:text-red-100 hover:bg-red-900 self-stretch'}
+          onClick={onDelete}
+        >
+          <Icon code={'delete_forever'}/>
         </button>
       </div>
       {shots}
@@ -299,12 +300,12 @@ function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, 
         color={shot.animated ? 'secondary' : 'primary'}
         onUpdate={value => onUpdate({...shot, notes: value})}
       />
-      <div className="col-start-6">
+      <div className="col-start-6 self-stretch hover:bg-red-900">
         <button
           onClick={onDelete}
-          className={'p-2 text-sm text-slate-500 hover:text-red-600'}
+          className={'p-2 text-sm text-slate-500 hover:text-red-100 h-full'}
         >
-          Delete
+          <Icon code={'delete_forever'}/>
         </button>
       </div>
     </>
