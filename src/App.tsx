@@ -51,11 +51,15 @@ function App() {
   })
   const sceneLinks = project.scenes.map((scene, sceneIndex) => {
     const sceneNumber = getSceneNumber(scene, sceneIndex)
+    const hasWipShots = !!scene.shots.find(shot => shot.status === 'wip')
+    const isDone = scene.shots.every(shot => shot.status === 'animated')
     return (
       <a
         key={sceneNumber}
         href={'#scene-' + sceneNumber.toString()}
-        className={'p-1'}
+        className={'py-1 px-2 rounded ' +
+          (isDone ? 'text-slate-500' : 'text-slate-200') + ' hover:text-slate-100 ' +
+          (hasWipShots ? 'bg-purple-800 hover:bg-purple-700' : 'hover:bg-slate-700')}
       >
         {sceneNumber}
       </a>
