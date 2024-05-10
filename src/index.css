@@ -16,5 +16,5 @@
 }
 
 :focus-visible {
-  @apply outline outline-2 outline-cyan-700;
+  @apply outline outline-2 outline-purple-500;
 }
