@@ -10,3 +10,7 @@
     font-size: 20px;
     --icon-opsz: 20
 }
+
+.material-symbols-rounded.fill {
+    --icon-fill: 1;
+}

@@ -1,6 +1,15 @@
 import {useEffect, useState} from 'react'
 import './App.css'
-import {loadProject, newProject, newScene, newShot, SceneData, ShotData} from './persistence.ts'
+import {
+  loadProject,
+  newProject,
+  newScene,
+  newShot,
+  nextStatus,
+  SceneData,
+  ShotData,
+  statusIconCode,
+} from './persistence.ts'
 import clipboard from 'clipboardy'
 import {getSceneNumber, nextShotAutoNumber, shotCode} from './codes.ts'
 import {Icon} from './Icon.tsx'
@@ -175,7 +184,7 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete, backupProject}: 
           className={'grow self-stretch my-0.5 p-2 font-bold text-lg rounded bg-transparent border-none placeholder:font-normal'}
           value={scene.description}
           placeholder={'No description'}
-          onChange={(event) => onUpdate({ ...scene, description: event.target.value })}
+          onChange={(event) => onUpdate({...scene, description: event.target.value})}
         />
         <button
           className={'p-2 text-sm text-slate-500 hover:text-red-100 hover:bg-red-900 self-stretch'}
@@ -194,7 +203,16 @@ function SceneTableRows({scene, sceneIndex, onUpdate, onDelete, backupProject}: 
   )
 }
 
-function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, onDelete, onAddBefore, onSwapWithPrevious}: {
+function ShotTableRow({
+                        shot,
+                        sceneNumber,
+                        shotNumber,
+                        showSwapButton,
+                        onUpdate,
+                        onDelete,
+                        onAddBefore,
+                        onSwapWithPrevious,
+                      }: {
   shot: ShotData,
   sceneNumber: number,
   shotNumber: number,
@@ -239,13 +257,26 @@ function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, 
     }
   }
 
-  const setAnimated = (animated: boolean) => {
-    onUpdate({...shot, animated, lockedNumber: animated && shot.lockedNumber === null ? shotNumber : shot.lockedNumber})
+  const cycleStatus = () => {
+    const next = nextStatus(shot.status)
+    const lockedNumber = (next === 'animated' || next === 'wip') && shot.lockedNumber === null
+      ? shotNumber
+      : shot.lockedNumber
+    onUpdate({...shot, status: next, lockedNumber})
+  }
+
+  const onStatusRightClicked = () => {
+    const status = shot.status === 'animated'
+      ? 'default'
+      : shot.status === 'unsure'
+        ? 'default'
+        : 'unsure'
+    onUpdate({...shot, status})
   }
 
   return (
     <>
-      <div className="col-start-1 grid grid-flow-col place-content-start items-center pl-2 group relative">
+      <div className={'col-start-1 grid grid-flow-col place-content-start items-center pl-2 group relative' + (shot.status === 'wip' ? ' !bg-purple-900' : '')}>
         <button
           className={'absolute top-0 left-0 -translate-x-[100%] -translate-y-1/2 opacity-0 group-hover:opacity-100'}
           onClick={onAddBefore}
@@ -258,15 +289,19 @@ function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, 
         >
             <Icon code={'swap_vert'}/>
         </button>}
-        <input
-          type={'checkbox'}
-          className={'cursor-pointer'}
-          checked={shot.animated}
-          onChange={value => setAnimated(value.target.checked)}
-        />
+        <button
+          onClick={cycleStatus}
+          onContextMenu={event => {
+            onStatusRightClicked()
+            event.preventDefault()
+          }}
+          className={shot.status === 'wip' ? 'text-slate-300 hover:text-slate-100' : 'text-slate-500 hover:text-slate-100'}
+        >
+          <Icon code={statusIconCode(shot.status)}/>
+        </button>
         <button
           onClick={lockAndCopyShotCode}
-          className={'p-2 pr-0 text-sm flex flex-row items-center ' + ((shot.lockedNumber != null) ? 'text-slate-300 hover:text-slate-100' : 'text-slate-500 hover:text-slate-100')}
+          className={'p-2 pr-0 text-sm flex flex-row items-center ' + (shot.lockedNumber != null ? 'text-slate-300 hover:text-slate-100' : 'text-slate-500 hover:text-slate-100')}
         >
           {shotFullCode}
           {shot.lockedNumber === null &&
@@ -291,19 +326,19 @@ function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, 
       <EditableTextCell
         column={'col-start-3'}
         value={shot.location ?? ''}
-        color={shot.animated ? 'secondary' : 'primary'}
+        className={shot.status !== 'animated' ? 'text-slate-200' : 'text-slate-500'}
         onUpdate={value => onUpdate({...shot, location: value.trim() === '' ? null : value})}
       />
       <EditableTextCell
         column={'col-start-4'}
         value={shot.description}
-        color={shot.animated ? 'secondary' : 'primary'}
+        className={shot.status !== 'animated' ? 'text-slate-200' : 'text-slate-500'}
         onUpdate={value => onUpdate({...shot, description: value})}
       />
       <EditableTextCell
         column={'col-start-5'}
         value={shot.notes}
-        color={shot.animated ? 'secondary' : 'primary'}
+        className={shot.status !== 'animated' ? 'text-slate-200' : 'text-slate-500'}
         onUpdate={value => onUpdate({...shot, notes: value})}
       />
       <div className="col-start-6 self-stretch hover:bg-red-900">
@@ -318,11 +353,11 @@ function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, 
   )
 }
 
-function EditableTextCell({column, value, color, onUpdate}: {
+function EditableTextCell({column, value, onUpdate, className}: {
   column: string,
   value: string,
-  color: 'primary' | 'secondary',
   onUpdate: (value: string) => void,
+  className?: string,
 }) {
   const [editing, setEditing] = useState(false)
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -343,7 +378,7 @@ function EditableTextCell({column, value, color, onUpdate}: {
       onFocus={() => setEditing(true)}
     >
       <div
-        className={`h-full cursor-pointer p-1 whitespace-break-spaces text-sm ${color === 'primary' ? 'text-slate-200' : 'text-slate-500'} hover:text-slate-100 hover:bg-slate-700`}
+        className={`h-full cursor-pointer p-1 whitespace-break-spaces text-sm ${className ?? ''} hover:text-slate-100 hover:bg-slate-700`}
         onClick={() => setEditing(true)}
       >
         {value}

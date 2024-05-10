@@ -31,6 +31,7 @@ export function newScene(): SceneData {
 }
 
 export interface ShotData {
+  status: ShotStatus
   lockedNumber: number | null
   description: string
   location: string | null
@@ -38,8 +39,41 @@ export interface ShotData {
   animated: boolean
 }
 
+export type ShotStatus =
+  | 'unsure'
+  | 'default'
+  | 'wip'
+  | 'animated'
+
+export function nextStatus(current: ShotStatus): ShotStatus {
+  switch (current) {
+    case 'unsure':
+      return 'default'
+    case 'default':
+      return 'wip'
+    case 'wip':
+      return 'animated'
+    case 'animated':
+      return 'animated'
+  }
+}
+
+export function statusIconCode(status: ShotStatus): string {
+  switch (status) {
+    case 'unsure':
+      return 'help_center'
+    case 'default':
+      return 'check_box_outline_blank'
+    case 'wip':
+      return 'filter_tilt_shift'
+    case 'animated':
+      return 'check_box'
+  }
+}
+
 export function newShot(data?: Partial<ShotData>): ShotData {
   return {
+    status: 'default',
     lockedNumber: null,
     description: '',
     location: null,
