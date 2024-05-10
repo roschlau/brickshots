@@ -4,6 +4,7 @@ import {loadProject, newProject, newScene, newShot, SceneData, ShotData} from '.
 import clipboard from 'clipboardy'
 import {getSceneNumber, nextShotAutoNumber, shotCode} from './codes.ts'
 import {Icon} from './Icon.tsx'
+import toast from 'react-hot-toast'
 
 function App() {
   const [project, setProject] = useState(loadProject())
@@ -209,7 +210,12 @@ function ShotTableRow({shot, sceneNumber, shotNumber, showSwapButton, onUpdate, 
     if (shot.lockedNumber === null) {
       onUpdate({...shot, lockedNumber: shotNumber})
     }
-    void clipboard.write(shotFullCode)
+    const copyPromise = clipboard.write(shotFullCode)
+    void toast.promise(copyPromise, {
+      loading: 'Copying...',
+      success: 'Shotcode copied to clipboard!',
+      error: 'Failed to copy shotcode to clipboard',
+    })
   }
 
   const editShotCode = () => {
