@@ -8,7 +8,7 @@ import {
   nextStatus,
   SceneData,
   ShotData,
-  statusIconCode,
+  statusIconCode, statusTooltip,
 } from './persistence.ts'
 import clipboard from 'clipboardy'
 import {getSceneNumber, nextShotAutoNumber, shotCode} from './codes.ts'
@@ -60,6 +60,8 @@ function App() {
         className={'py-1 px-2 rounded ' +
           (isDone ? 'text-slate-500' : 'text-slate-200') + ' hover:text-slate-100 ' +
           (hasWipShots ? 'bg-purple-800 hover:bg-purple-700' : 'hover:bg-slate-700')}
+        data-tooltip-id={'tooltip'}
+        data-tooltip-content={scene.description || ('Scene ' + sceneNumber)}
       >
         {sceneNumber}
       </a>
@@ -300,12 +302,18 @@ function ShotTableRow({
             event.preventDefault()
           }}
           className={shot.status === 'wip' ? 'text-slate-300 hover:text-slate-100' : 'text-slate-500 hover:text-slate-100'}
+          data-tooltip-id={'tooltip'}
+          data-tooltip-html={statusTooltip(shot.status)}
+          data-tooltip-place={'bottom'}
         >
           <Icon code={statusIconCode(shot.status)}/>
         </button>
         <button
           onClick={lockAndCopyShotCode}
           className={'p-2 pr-0 text-sm flex flex-row items-center ' + (shot.lockedNumber != null ? 'text-slate-300 hover:text-slate-100' : 'text-slate-500 hover:text-slate-100')}
+          data-tooltip-id={'tooltip'}
+          data-tooltip-content={'Click to copy'}
+          data-tooltip-place={'bottom'}
         >
           {shotFullCode}
           {shot.lockedNumber === null &&
@@ -318,7 +326,9 @@ function ShotTableRow({
         {shot.lockedNumber !== null &&
             <button
                 onClick={editShotCode}
-                className={'p-2 pl-1 flex flex-row items-center opacity-0 group-hover:opacity-100'}
+                className={'p-2 pl-1 flex flex-row items-center opacity-0 group-hover:opacity-100'}data-tooltip-id={'tooltip'}
+                data-tooltip-content={'Edit Shotcode'}
+                data-tooltip-place={'bottom'}
             >
                 <Icon
                     code={'edit'}

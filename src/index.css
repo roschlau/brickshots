@@ -15,6 +15,19 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  /* https://react-tooltip.com/docs/getting-started#styling */
+  --rt-color-white: #f1f5f9;
+  --rt-color-dark: #020617;
+  --rt-color-success: #8dc572;
+  --rt-color-error: #be6464;
+  --rt-color-warning: #f0ad4e;
+  --rt-color-info: #337ab7;
+  --rt-opacity: 0.9;
+  --rt-transition-show-delay: 0.15s;
+  --rt-transition-closing-delay: 0.15s;
+}
+
 :focus-visible {
   @apply outline outline-2 outline-purple-500;
 }
