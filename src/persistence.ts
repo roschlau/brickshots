@@ -7,3 +7,13 @@ export function loadProject(): ProjectData {
   }
   return newProject()
 }
+
+export function download(project: ProjectData) {
+  const element = document.createElement('a')
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(project)))
+  element.setAttribute('download', 'brickshots-project.json')
+  element.style.display = 'none'
+  document.body.appendChild(element)
+  element.click()
+  document.body.removeChild(element)
+}

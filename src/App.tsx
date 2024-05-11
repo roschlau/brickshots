@@ -1,9 +1,8 @@
 import {useEffect, useState} from 'react'
 import './App.css'
 import {
+  download,
   loadProject,
-
-
 
 
 } from './persistence.ts'
@@ -75,7 +74,10 @@ function App() {
   })
   return (
     <>
-      <DevBar onResetProject={resetProject} onBackupProject={backupProject}/>
+      <DevBar
+        onBackupProject={() => download(project)}
+        onResetProject={resetProject}
+      />
       <h1 className="text-3xl my-4">
         BrickShots
       </h1>
@@ -102,12 +104,12 @@ function App() {
 
 function DevBar({onResetProject, onBackupProject}: {
   onResetProject: () => void,
-  onBackupProject: (reason: string) => void
+  onBackupProject: () => void,
 }) {
   return (
     <div className={'absolute top-0 right-0 flex flex-row'}>
-      <button className={'p-2'} onClick={() => onBackupProject('manual')}>
-        Backup Project
+      <button className={'p-2'} onClick={onBackupProject}>
+        Export Project
       </button>
       <button className={'p-2'} onClick={onResetProject}>
         New Project
