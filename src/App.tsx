@@ -2,18 +2,24 @@ import {useEffect, useState} from 'react'
 import './App.css'
 import {
   loadProject,
-  newProject,
-  newScene,
-  newShot,
-  nextStatus,
-  SceneData,
-  ShotData,
-  statusIconCode, statusTooltip,
+
+
+
+
 } from './persistence.ts'
 import clipboard from 'clipboardy'
 import {getSceneNumber, nextShotAutoNumber, shotCode} from './codes.ts'
 import {Icon} from './Icon.tsx'
 import toast from 'react-hot-toast'
+import {
+  newShot,
+  ShotData,
+
+
+} from './data-model/shot.ts'
+import {nextStatus, statusIconCode, statusTooltip} from './data-model/shot-status.ts'
+import {newProject} from './data-model/project.ts'
+import {newScene, SceneData} from './data-model/scene.ts'
 
 function App() {
   const [project, setProject] = useState(loadProject())

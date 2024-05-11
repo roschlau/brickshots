@@ -1,0 +1,44 @@
+export type ShotStatus =
+  | 'unsure'
+  | 'default'
+  | 'wip'
+  | 'animated'
+
+export function nextStatus(current: ShotStatus): ShotStatus {
+  switch (current) {
+    case 'unsure':
+      return 'default'
+    case 'default':
+      return 'wip'
+    case 'wip':
+      return 'animated'
+    case 'animated':
+      return 'animated'
+  }
+}
+
+export function statusIconCode(status: ShotStatus): string {
+  switch (status) {
+    case 'unsure':
+      return 'help_center'
+    case 'default':
+      return 'check_box_outline_blank'
+    case 'wip':
+      return 'filter_tilt_shift'
+    case 'animated':
+      return 'check_box'
+  }
+}
+
+export function statusTooltip(status: ShotStatus): string {
+  switch (status) {
+    case 'unsure':
+      return 'Click to unmark as Unsure'
+    case 'default':
+      return 'Click to mark as WIP<br>Right-click to mark as Unsure'
+    case 'wip':
+      return 'Click to mark as Animated'
+    case 'animated':
+      return 'Right-click to unmark as Animated'
+  }
+}
