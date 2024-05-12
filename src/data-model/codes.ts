@@ -1,4 +1,4 @@
-import {SceneData} from './data-model/scene.ts'
+import {SceneData} from './scene.ts'
 
 export function getSceneNumber(scene: Pick<SceneData, 'lockedNumber'>, index: number): number {
   return scene.lockedNumber ?? index + 1
