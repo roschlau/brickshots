@@ -1,23 +1,13 @@
 import {useEffect, useState} from 'react'
 import './App.css'
-import {
-  download,
-  loadProject,
-
-
-} from './persistence.ts'
+import {download, loadProject, openProject} from './persistence.ts'
 import clipboard from 'clipboardy'
 import {getSceneNumber, nextShotAutoNumber, shotCode} from './codes.ts'
 import {Icon} from './Icon.tsx'
 import toast from 'react-hot-toast'
-import {
-  newShot,
-  ShotData,
-
-
-} from './data-model/shot.ts'
+import {newShot, ShotData} from './data-model/shot.ts'
 import {nextStatus, statusIconCode, statusTooltip} from './data-model/shot-status.ts'
-import {newProject} from './data-model/project.ts'
+import {newProject, ProjectData} from './data-model/project.ts'
 import {newScene, SceneData} from './data-model/scene.ts'
 
 function App() {
@@ -31,6 +21,19 @@ function App() {
   const resetProject = () => {
     backupProject('before-new-project')
     setProject(newProject)
+  }
+  const loadProjectFromFile = async (file: File) => {
+    await toast.promise<ProjectData>(
+      openProject(file),
+      {
+        loading: 'Loading file...',
+        success: (project) => {
+          setProject(project)
+          return 'Project loaded!'
+        },
+        error: (e) => 'Project couldn\'t be loaded:\n' + e,
+      },
+    )
   }
   const addScene = () => setProject({...project, scenes: [...project.scenes, newScene()]})
   const scenes = project.scenes.map((scene, sceneIndex) => {
@@ -75,8 +78,9 @@ function App() {
   return (
     <>
       <DevBar
-        onBackupProject={() => download(project)}
-        onResetProject={resetProject}
+        onSaveProject={() => download(project)}
+        onNewProject={resetProject}
+        onOpenFile={file => void loadProjectFromFile(file)}
       />
       <h1 className="text-3xl my-4">
         BrickShots
@@ -102,17 +106,31 @@ function App() {
   )
 }
 
-function DevBar({onResetProject, onBackupProject}: {
-  onResetProject: () => void,
-  onBackupProject: () => void,
+function DevBar({onNewProject, onSaveProject, onOpenFile}: {
+  onNewProject: () => void,
+  onSaveProject: () => void,
+  onOpenFile: (file: File) => void,
 }) {
   return (
-    <div className={'absolute top-0 right-0 flex flex-row'}>
-      <button className={'p-2'} onClick={onBackupProject}>
-        Export Project
+    <div className={'absolute top-1 right-1 flex flex-row'}>
+      <button className={'p-2 flex flex-row items-center gap-1 rounded hover:bg-slate-700'} onClick={onNewProject}>
+        <Icon code={'add_circle'}/>
+        New
       </button>
-      <button className={'p-2'} onClick={onResetProject}>
-        New Project
+      <input id="openProjectInput" type="file" className="sr-only" onChange={event => {
+        const file = event.target.files?.[0]
+        if (file) {
+          onOpenFile(file)
+        }
+      }}/>
+      <label htmlFor="openProjectInput"
+             className={'cursor-pointer p-2 flex flex-row items-center gap-1 rounded hover:bg-slate-700'}>
+        <Icon code={'folder_open'}/>
+        Open
+      </label>
+      <button className={'p-2 flex flex-row items-center gap-1 rounded hover:bg-slate-700'} onClick={onSaveProject}>
+        <Icon code={'save'}/>
+        Save
       </button>
     </div>
   )
@@ -290,7 +308,8 @@ function ShotTableRow({
 
   return (
     <>
-      <div className={'col-start-1 grid grid-flow-col place-content-start items-center pl-2 group relative' + (shot.status === 'wip' ? ' !bg-purple-900' : '')}>
+      <div
+        className={'col-start-1 grid grid-flow-col place-content-start items-center pl-2 group relative' + (shot.status === 'wip' ? ' !bg-purple-900' : '')}>
         <button
           className={'absolute top-0 left-0 -translate-x-[100%] -translate-y-1/2 opacity-0 group-hover:opacity-100'}
           onClick={onAddBefore}
@@ -334,7 +353,8 @@ function ShotTableRow({
         {shot.lockedNumber !== null &&
             <button
                 onClick={editShotCode}
-                className={'p-2 pl-1 flex flex-row items-center opacity-0 group-hover:opacity-100'}data-tooltip-id={'tooltip'}
+                className={'p-2 pl-1 flex flex-row items-center opacity-0 group-hover:opacity-100'}
+                data-tooltip-id={'tooltip'}
                 data-tooltip-content={'Edit Shotcode'}
                 data-tooltip-place={'bottom'}
             >

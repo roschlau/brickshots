@@ -17,3 +17,10 @@ export function download(project: ProjectData) {
   element.click()
   document.body.removeChild(element)
 }
+
+export async function openProject(file: File): Promise<ProjectData> {
+  if (!file.type.startsWith('application/json')) {
+    throw Error('Project files need to be JSON, file was ' + file.type)
+  }
+  return JSON.parse(await file.text()) as ProjectData
+}
