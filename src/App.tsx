@@ -76,16 +76,18 @@ function App() {
   })
   return (
     <>
-      <DevBar
-        onSaveProject={() => download(project)}
-        onNewProject={resetProject}
-        onOpenFile={file => void loadProjectFromFile(file)}
-      />
-      <h1 className="text-3xl my-4">
-        BrickShots
-      </h1>
+      <div className={'w-full max-w-screen-xl flex flex-row items-center mb-4'}>
+        <h1 className="text-3xl my-4 grow">
+          BrickShots
+        </h1>
+        <ProjectMenu
+          onSaveProject={() => download(project)}
+          onNewProject={resetProject}
+          onOpenFile={file => void loadProjectFromFile(file)}
+        />
+      </div>
       <div className={'flex flex-row items-center'}>
-        Scenes:
+        <span className={'mr-1'}>Scenes:</span>
         {sceneLinks}
       </div>
       <div
@@ -105,14 +107,14 @@ function App() {
   )
 }
 
-function DevBar({onNewProject, onSaveProject, onOpenFile}: {
+function ProjectMenu({onNewProject, onSaveProject, onOpenFile}: {
   onNewProject: () => void,
   onSaveProject: () => void,
   onOpenFile: (file: File) => void,
 }) {
   return (
-    <div className={'absolute top-1 right-1 flex flex-row'}>
-      <button className={'p-2 flex flex-row items-center gap-1 rounded hover:bg-slate-700'} onClick={onNewProject}>
+    <div className={'flex flex-row'}>
+      <button className={'p-2 flex flex-row items-center gap-2 rounded hover:bg-slate-700'} onClick={onNewProject}>
         <Icon code={'add_circle'}/>
         New
       </button>
@@ -123,12 +125,12 @@ function DevBar({onNewProject, onSaveProject, onOpenFile}: {
         }
       }}/>
       <label htmlFor="openProjectInput"
-             className={'cursor-pointer p-2 flex flex-row items-center gap-1 rounded hover:bg-slate-700'}>
-        <Icon code={'folder_open'}/>
+             className={'cursor-pointer p-2 flex flex-row items-center gap-2 rounded hover:bg-slate-700'}>
+        <Icon code={'upload'}/>
         Open
       </label>
-      <button className={'p-2 flex flex-row items-center gap-1 rounded hover:bg-slate-700'} onClick={onSaveProject}>
-        <Icon code={'save'}/>
+      <button className={'p-2 flex flex-row items-center gap-2 rounded hover:bg-slate-700'} onClick={onSaveProject}>
+        <Icon code={'download'}/>
         Save
       </button>
     </div>
