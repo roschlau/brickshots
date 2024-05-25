@@ -76,19 +76,21 @@ function App() {
   })
   return (
     <>
-      <div className={'w-full max-w-screen-xl flex flex-row items-center mb-4'}>
-        <h1 className="text-3xl my-4 grow">
-          BrickShots
-        </h1>
-        <ProjectMenu
-          onSaveProject={() => download(project)}
-          onNewProject={resetProject}
-          onOpenFile={file => void loadProjectFromFile(file)}
-        />
-      </div>
-      <div className={'flex flex-row items-center'}>
-        <span className={'mr-1'}>Scenes:</span>
-        {sceneLinks}
+      <div className={'w-full max-w-screen-xl top-0 sticky z-10 flex flex-col pb-4 items-center bg-slate-800'}>
+        <div className={'w-full flex flex-row items-center mb-4'}>
+          <h1 className="text-3xl my-4 grow">
+            BrickShots
+          </h1>
+          <ProjectMenu
+            onSaveProject={() => download(project)}
+            onNewProject={resetProject}
+            onOpenFile={file => void loadProjectFromFile(file)}
+          />
+        </div>
+        <div className={'flex flex-row items-center'}>
+          <span className={'mr-1'}>Scenes:</span>
+          {sceneLinks}
+        </div>
       </div>
       <div
         className="w-full max-w-screen-xl grid mb-10

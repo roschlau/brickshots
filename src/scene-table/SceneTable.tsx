@@ -74,7 +74,7 @@ export function SceneTable({scene, sceneIndex, onUpdate, onDelete, backupProject
     <>
       <div
         id={'scene-' + sceneNumber.toString()}
-        className="col-start-1 col-span-full rounded-t-md mt-4 pl-3 pr-0 flex flex-row gap-2 items-center overflow-hidden"
+        className="col-start-1 col-span-full rounded-t-md pl-3 pr-0 flex flex-row gap-2 items-center overflow-hidden"
       >
         <span className={'font-bold text-lg'}>
           #{sceneNumber}
@@ -95,7 +95,7 @@ export function SceneTable({scene, sceneIndex, onUpdate, onDelete, backupProject
       </div>
       {shots}
       <button
-        className={'col-start-1 col-span-full rounded-b-md p-2 pb-3 text-start text-slate-300 hover:text-slate-100 hover:bg-slate-700'}
+        className={'col-start-1 col-span-full mb-4 rounded-b-md p-2 pb-3 text-start text-slate-300 hover:text-slate-100 hover:bg-slate-700'}
         onClick={() => addNewShot(scene.shots.length)}>
         + Add Shot
       </button>

@@ -11,7 +11,9 @@ if (!root) {
 }
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
-    <App />
+    <div className={'flex flex-col items-center isolate'}>
+      <App/>
+    </div>
     <Toaster/>
     <Tooltip id={'tooltip'}/>
   </React.StrictMode>,
