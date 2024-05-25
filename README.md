@@ -1,4 +1,4 @@
-# Brickshots
+# BrickShot
 
 This is simple shotlist manager I use for planning and keeping track of the shots I need to animate for my brickfilms.
 
