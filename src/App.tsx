@@ -8,8 +8,11 @@ import toast from 'react-hot-toast'
 import {newProject, ProjectData} from './data-model/project.ts'
 import {newScene, SceneData} from './data-model/scene.ts'
 import {SceneTable} from './scene-table/SceneTable.tsx'
+import {ShotStatus} from './data-model/shot-status.ts'
+import {StatusFilterSelector} from './StatusFilterSelector.tsx'
 
 function App() {
+  // Project State
   const [project, setProject] = useState(loadProject())
   useEffect(() => localStorage.setItem('project', JSON.stringify(project)), [project])
   const backupProject = (reason: string) => {
@@ -34,6 +37,11 @@ function App() {
       },
     )
   }
+
+  // UI State
+  const [statusFilter, setStatusFilter] = useState<ShotStatus[]>([])
+
+  // Scenes
   const addScene = () => setProject({...project, scenes: [...project.scenes, newScene()]})
   const scenes = project.scenes.map((scene, sceneIndex) => {
     const updateScene = (updatedScene: SceneData) => {
@@ -50,12 +58,15 @@ function App() {
         key={getSceneNumber(scene, sceneIndex)}
         scene={scene}
         sceneIndex={sceneIndex}
+        shotStatusFilter={statusFilter}
         onUpdate={updateScene}
         onDelete={deleteScene}
         backupProject={backupProject}
       />
     )
   })
+
+  // Scene Links
   const sceneLinks = project.scenes.map((scene, sceneIndex) => {
     const sceneNumber = getSceneNumber(scene, sceneIndex)
     const hasWipShots = !!scene.shots.find(shot => shot.status === 'wip')
@@ -74,9 +85,11 @@ function App() {
       </a>
     )
   })
+
+  // Component
   return (
     <>
-      <div className={'w-full max-w-screen-xl top-0 sticky z-10 flex flex-col pb-4 items-center bg-slate-800'}>
+      <div className={'w-full max-w-screen-xl top-0 sticky z-10 flex flex-col pb-4 items-start bg-slate-800'}>
         <div className={'w-full flex flex-row items-center mb-4'}>
           <h1 className="text-3xl my-4 grow">
             BrickShot
@@ -87,9 +100,14 @@ function App() {
             onOpenFile={file => void loadProjectFromFile(file)}
           />
         </div>
-        <div className={'flex flex-row items-center'}>
-          <span className={'mr-1'}>Scenes:</span>
-          {sceneLinks}
+        <div className={'self-stretch flex flex-row items-center'}>
+          <div className={'grow flex flex-row items-center'}>
+            <span className={'mr-1'}>Scenes:</span>
+            {sceneLinks}
+          </div>
+          <div className={'flex flex-row items-center'}>
+            <StatusFilterSelector selected={statusFilter} onChange={setStatusFilter}/>
+          </div>
         </div>
       </div>
       <div

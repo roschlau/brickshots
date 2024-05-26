@@ -3,10 +3,12 @@ import {getSceneNumber, nextShotAutoNumber} from '../data-model/codes.ts'
 import {newShot, ShotData} from '../data-model/shot.ts'
 import {ShotTableRow} from './ShotTableRow.tsx'
 import {Icon} from '../ui-atoms/Icon.tsx'
+import {ShotStatus} from '../data-model/shot-status.ts'
 
-export function SceneTable({scene, sceneIndex, onUpdate, onDelete, backupProject}: {
+export function SceneTable({scene, sceneIndex, shotStatusFilter, onUpdate, onDelete, backupProject}: {
   scene: SceneData,
   sceneIndex: number,
+  shotStatusFilter: ShotStatus[],
   onUpdate: (scene: SceneData) => void,
   onDelete: () => void,
   backupProject: (reason: string) => void,
@@ -23,54 +25,56 @@ export function SceneTable({scene, sceneIndex, onUpdate, onDelete, backupProject
       shots: newShots,
     })
   }
-  const shots = scene.shots.map((shot, shotIndex) => {
-    const updateShot = (updatedShot: ShotData) => {
-      onUpdate({
-        ...scene,
-        lockedNumber: updatedShot.lockedNumber && !scene.lockedNumber ? sceneNumber : scene.lockedNumber,
-        shots: scene.shots.map((oldShot, i) => i === shotIndex ? updatedShot : oldShot),
-      })
-    }
-    const deleteShot = () => {
-      backupProject('before-shot-deletion')
-      onUpdate({
-        ...scene,
-        shots: scene.shots.filter((_, i) => i !== shotIndex),
-      })
-    }
-    const swapWithPrevious = () => {
-      const previous = scene.shots[shotIndex - 1]
-      const current = scene.shots[shotIndex]
-      if (current === undefined || previous === undefined) {
-        throw Error()
+  const shots = scene.shots
+    .filter(shot => shotStatusFilter.length === 0 || shotStatusFilter.includes(shot.status))
+    .map((shot, shotIndex) => {
+      const updateShot = (updatedShot: ShotData) => {
+        onUpdate({
+          ...scene,
+          lockedNumber: updatedShot.lockedNumber && !scene.lockedNumber ? sceneNumber : scene.lockedNumber,
+          shots: scene.shots.map((oldShot, i) => i === shotIndex ? updatedShot : oldShot),
+        })
       }
-      onUpdate({
-        ...scene,
-        shots: scene.shots.map((shot, i) =>
-          i === shotIndex - 1
-            ? current
-            : i === shotIndex
-              ? previous
-              : shot),
-      })
-    }
-    const shotNumber = shot.lockedNumber ?? nextShotAutoNumber(shotNumbers[shotIndex - 1] ?? 0, lockedShotNumbers)
-    shotNumbers[shotIndex] = shotNumber
-    return (
-      <ShotTableRow
-        key={shotNumber}
-        shot={shot}
-        sceneNumber={sceneNumber}
-        shotNumber={shotNumber}
-        showSwapButton={shotIndex > 0}
-        onUpdate={updateShot}
-        onDelete={deleteShot}
-        onAddBefore={() => addNewShot(shotIndex)}
-        onSwapWithPrevious={swapWithPrevious}
-      />
-    )
-  })
-  return (
+      const deleteShot = () => {
+        backupProject('before-shot-deletion')
+        onUpdate({
+          ...scene,
+          shots: scene.shots.filter((_, i) => i !== shotIndex),
+        })
+      }
+      const swapWithPrevious = () => {
+        const previous = scene.shots[shotIndex - 1]
+        const current = scene.shots[shotIndex]
+        if (current === undefined || previous === undefined) {
+          throw Error()
+        }
+        onUpdate({
+          ...scene,
+          shots: scene.shots.map((shot, i) =>
+            i === shotIndex - 1
+              ? current
+              : i === shotIndex
+                ? previous
+                : shot),
+        })
+      }
+      const shotNumber = shot.lockedNumber ?? nextShotAutoNumber(shotNumbers[shotIndex - 1] ?? 0, lockedShotNumbers)
+      shotNumbers[shotIndex] = shotNumber
+      return (
+        <ShotTableRow
+          key={shotNumber}
+          shot={shot}
+          sceneNumber={sceneNumber}
+          shotNumber={shotNumber}
+          showSwapButton={shotIndex > 0}
+          onUpdate={updateShot}
+          onDelete={deleteShot}
+          onAddBefore={() => addNewShot(shotIndex)}
+          onSwapWithPrevious={swapWithPrevious}
+        />
+      )
+    })
+  return shots.length === 0 && scene.shots.length !== 0 ? null : (
     <>
       <div
         id={'scene-' + sceneNumber.toString()}

@@ -1,8 +1,11 @@
-export type ShotStatus =
-  | 'unsure'
-  | 'default'
-  | 'wip'
-  | 'animated'
+export const shotStatusValues = [
+  'default',
+  'unsure',
+  'wip',
+  'animated',
+] as const
+
+export type ShotStatus = typeof shotStatusValues[number]
 
 export function nextStatus(current: ShotStatus): ShotStatus {
   switch (current) {
