@@ -28,6 +28,6 @@ body {
   --rt-transition-closing-delay: 0.15s;
 }
 
-:focus-visible {
+:focus-visible, :focus + label {
   @apply outline outline-2 outline-purple-500;
 }
