@@ -30,4 +30,17 @@ body {
 
 :focus-visible, :focus + label {
   @apply outline outline-2 outline-purple-500;
+  animation: outline-bounce .4s ease-in-out;
+}
+
+@keyframes outline-bounce {
+  0% {
+    outline-width: 0;
+  }
+  40% {
+    outline-width: 6px;
+  }
+  100% {
+    outline-width: 2px;
+  }
 }
