@@ -66,7 +66,8 @@ export function SceneTable({scene, sceneIndex, shotStatusFilter, onUpdate, onDel
           shot={shot}
           sceneNumber={sceneNumber}
           shotNumber={shotNumber}
-          showSwapButton={shotIndex > 0}
+          showAddBeforeButton={shotStatusFilter.length === 0}
+          showSwapButton={shotIndex > 0 && shotStatusFilter.length === 0}
           onUpdate={updateShot}
           onDelete={deleteShot}
           onAddBefore={() => addNewShot(shotIndex)}

@@ -10,6 +10,7 @@ export function ShotTableRow({
                                shot,
                                sceneNumber,
                                shotNumber,
+                               showAddBeforeButton,
                                showSwapButton,
                                onUpdate,
                                onDelete,
@@ -19,6 +20,7 @@ export function ShotTableRow({
   shot: ShotData,
   sceneNumber: number,
   shotNumber: number,
+  showAddBeforeButton: boolean,
   showSwapButton: boolean,
   onUpdate: (shot: ShotData) => void,
   onDelete: () => void,
@@ -81,12 +83,12 @@ export function ShotTableRow({
     <>
       <div
         className={'col-start-1 grid grid-flow-col place-content-start items-center pl-2 group relative' + (shot.status === 'wip' ? ' !bg-purple-900' : '')}>
-        <button
+        {showAddBeforeButton && <button
           className={'absolute top-0 left-0 -translate-x-[100%] -translate-y-1/2 opacity-0 group-hover:opacity-100'}
           onClick={onAddBefore}
         >
           <Icon code={'add'}/>
-        </button>
+        </button>}
         {showSwapButton && <button
             className={'absolute top-0 left-0 -translate-x-[200%] -translate-y-1/2 opacity-0 group-hover:opacity-100'}
             onClick={onSwapWithPrevious}
