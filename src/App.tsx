@@ -138,7 +138,7 @@ function ProjectMenu({onNewProject, onSaveProject, onOpenFile}: {
         <Icon code={'add_circle'}/>
         New
       </button>
-      <input id="openProjectInput" type="file" className="sr-only" onChange={event => {
+      <input id="openProjectInput" type="file" accept="application/json" className="sr-only" onChange={event => {
         const file = event.target.files?.[0]
         if (file) {
           onOpenFile(file)
