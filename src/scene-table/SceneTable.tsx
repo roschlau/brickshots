@@ -26,9 +26,11 @@ export function SceneTable({scene, sceneIndex, shotStatusFilter, onUpdate, onDel
     })
   }
   const shots = scene.shots
-    .filter(shot => shotStatusFilter.length === 0 || shotStatusFilter.includes(shot.status))
-    .map((shot, shotIndex) => {
+    .map((shot, shotIndex) => [shot, shotIndex] as const)
+    .filter(([shot]) => shotStatusFilter.length === 0 || shotStatusFilter.includes(shot.status))
+    .map(([shot, shotIndex]) => {
       const updateShot = (updatedShot: ShotData) => {
+        console.trace('Shot updated', shotIndex, updatedShot)
         onUpdate({
           ...scene,
           lockedNumber: updatedShot.lockedNumber && !scene.lockedNumber ? sceneNumber : scene.lockedNumber,

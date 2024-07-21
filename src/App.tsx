@@ -45,6 +45,7 @@ function App() {
   const addScene = () => setProject({...project, scenes: [...project.scenes, newScene()]})
   const scenes = project.scenes.map((scene, sceneIndex) => {
     const updateScene = (updatedScene: SceneData) => {
+      console.trace('Scene updated', sceneIndex, updatedScene)
       setProject({...project, scenes: project.scenes.map((oldScene, i) => i === sceneIndex ? updatedScene : oldScene)})
     }
 
