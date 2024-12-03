@@ -22,7 +22,7 @@ describe('sceneNumber(element, index)', () => {
   })
 })
 
-describe('nextElementAutoNumber(previous, allLocked)', () => {
+describe('nextShotAutoNumber(previous, allLocked)', () => {
   it('should start with 10', () => {
     expect(nextShotAutoNumber(0, []))
       .toBe(10)
