@@ -45,7 +45,7 @@ export function ShotTableRow({
     if (shot.lockedNumber === null) {
       throw Error('Shotcode not locked')
     }
-    const newShotCode = window.prompt('Change locked shot code to:', shot.lockedNumber.toString())
+    const newShotCode = window.prompt('Enter new shot code. Clear and Confirm to unlock shot code.', shot.lockedNumber.toString())
     if (newShotCode !== null) {
       if (newShotCode.trim().length === 0) {
         onUpdate({...shot, lockedNumber: null})
