@@ -5,6 +5,12 @@ import {ShotTableRow} from './ShotTableRow.tsx'
 import {Icon} from '../ui-atoms/Icon.tsx'
 import {ShotStatus} from '../data-model/shot-status.ts'
 
+interface ShotViewModel {
+  indexInScene: number,
+  shotNumber: number,
+  shotData: ShotData
+}
+
 export function SceneTable({scene, sceneIndex, shotStatusFilter, onUpdate, onDelete, backupProject}: {
   scene: SceneData,
   sceneIndex: number,
@@ -25,59 +31,66 @@ export function SceneTable({scene, sceneIndex, shotStatusFilter, onUpdate, onDel
       shots: newShots,
     })
   }
-  const shots = scene.shots
-    .map((shot, shotIndex) => [shot, shotIndex] as const)
-    .filter(([shot]) => shotStatusFilter.length === 0 || shotStatusFilter.includes(shot.status))
-    .map(([shot, shotIndex]) => {
+  const shotViewModels = scene.shots
+    .map((shot, shotIndex) => {
+      const shotNumber = shot.lockedNumber ?? nextShotAutoNumber(shotNumbers[shotIndex - 1] ?? 0, lockedShotNumbers)
+      shotNumbers[shotIndex] = shotNumber
+      return {
+        indexInScene: shotIndex,
+        shotNumber,
+        shotData: shot,
+      } satisfies ShotViewModel
+    })
+  const shotTableRows = shotViewModels
+    .filter(({shotData}) => shotStatusFilter.length === 0 || shotStatusFilter.includes(shotData.status))
+    .map(({ shotData, indexInScene, shotNumber }) => {
       const updateShot = (updatedShot: ShotData) => {
-        console.trace('Shot updated', shotIndex, updatedShot)
+        console.trace('Shot updated', indexInScene, updatedShot)
         onUpdate({
           ...scene,
           lockedNumber: updatedShot.lockedNumber && !scene.lockedNumber ? sceneNumber : scene.lockedNumber,
-          shots: scene.shots.map((oldShot, i) => i === shotIndex ? updatedShot : oldShot),
+          shots: scene.shots.map((oldShot, i) => i === indexInScene ? updatedShot : oldShot),
         })
       }
       const deleteShot = () => {
         backupProject('before-shot-deletion')
         onUpdate({
           ...scene,
-          shots: scene.shots.filter((_, i) => i !== shotIndex),
+          shots: scene.shots.filter((_, i) => i !== indexInScene),
         })
       }
       const swapWithPrevious = () => {
-        const previous = scene.shots[shotIndex - 1]
-        const current = scene.shots[shotIndex]
+        const previous = scene.shots[indexInScene - 1]
+        const current = scene.shots[indexInScene]
         if (current === undefined || previous === undefined) {
           throw Error()
         }
         onUpdate({
           ...scene,
           shots: scene.shots.map((shot, i) =>
-            i === shotIndex - 1
+            i === indexInScene - 1
               ? current
-              : i === shotIndex
+              : i === indexInScene
                 ? previous
                 : shot),
         })
       }
-      const shotNumber = shot.lockedNumber ?? nextShotAutoNumber(shotNumbers[shotIndex - 1] ?? 0, lockedShotNumbers)
-      shotNumbers[shotIndex] = shotNumber
       return (
         <ShotTableRow
           key={shotNumber}
-          shot={shot}
+          shot={shotData}
           sceneNumber={sceneNumber}
           shotNumber={shotNumber}
           showAddBeforeButton={shotStatusFilter.length === 0}
-          showSwapButton={shotIndex > 0 && shotStatusFilter.length === 0}
+          showSwapButton={indexInScene > 0 && shotStatusFilter.length === 0}
           onUpdate={updateShot}
           onDelete={deleteShot}
-          onAddBefore={() => addNewShot(shotIndex)}
+          onAddBefore={() => addNewShot(indexInScene)}
           onSwapWithPrevious={swapWithPrevious}
         />
       )
     })
-  return shots.length === 0 && scene.shots.length !== 0 ? null : (
+  return shotTableRows.length === 0 && scene.shots.length !== 0 ? null : (
     <>
       <div
         id={'scene-' + sceneNumber.toString()}
@@ -100,7 +113,7 @@ export function SceneTable({scene, sceneIndex, shotStatusFilter, onUpdate, onDel
           <Icon code={'delete_forever'}/>
         </button>
       </div>
-      {shots}
+      {shotTableRows}
       <button
         className={'col-start-1 col-span-full mb-4 rounded-b-md p-2 pb-3 text-start text-slate-300 hover:text-slate-100 hover:bg-slate-700'}
         onClick={() => addNewShot(scene.shots.length)}>
