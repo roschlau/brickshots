@@ -1,3 +1,6 @@
+import { Doc } from '../../convex/_generated/dataModel'
+import { v } from 'convex/values'
+
 export const shotStatusValues = [
   'default',
   'unsure',
@@ -5,7 +8,14 @@ export const shotStatusValues = [
   'animated',
 ] as const
 
-export type ShotStatus = typeof shotStatusValues[number]
+export const vShotStatus = v.union(
+  v.literal('default'),
+  v.literal('unsure'),
+  v.literal('wip'),
+  v.literal('animated'),
+)
+
+export type ShotStatus = Doc<'shots'>['status']
 
 export function nextStatus(current: ShotStatus): ShotStatus {
   switch (current) {

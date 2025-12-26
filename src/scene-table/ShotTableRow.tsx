@@ -1,37 +1,55 @@
-import {ShotData} from '../data-model/shot.ts'
-import {shotCode} from '../data-model/codes.ts'
+import { shotCode } from '../data-model/codes.ts'
 import clipboard from 'clipboardy'
 import toast from 'react-hot-toast'
-import {nextStatus, statusIconCode, statusTooltip} from '../data-model/shot-status.ts'
-import {Icon} from '../ui-atoms/Icon.tsx'
-import {EditableTextCell} from './EditableTextCell.tsx'
+import { nextStatus, statusIconCode, statusTooltip } from '../data-model/shot-status.ts'
+import { Icon } from '../ui-atoms/Icon.tsx'
+import { EditableTextCell } from './EditableTextCell.tsx'
+import { useMutation, useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
+import { Id } from '../../convex/_generated/dataModel'
 
 export function ShotTableRow({
-                               shot,
-                               sceneNumber,
-                               shotNumber,
-                               showAddBeforeButton,
-                               showSwapButton,
-                               onUpdate,
-                               onDelete,
-                               onAddBefore,
-                               onSwapWithPrevious,
-                             }: {
-  shot: ShotData,
+  shotId,
+  sceneNumber,
+  shotNumber,
+  showAddBeforeButton,
+  showSwapButton,
+  onAddBefore,
+  onSwapWithPrevious,
+}: {
+  shotId: Id<'shots'>
   sceneNumber: number,
   shotNumber: number,
   showAddBeforeButton: boolean,
   showSwapButton: boolean,
-  onUpdate: (shot: ShotData) => void,
-  onDelete: () => void,
   onAddBefore: () => void,
   onSwapWithPrevious: () => void,
 }) {
+  const shot = useQuery(api.shots.get, { id: shotId })
+  const updateShot = useMutation(api.shots.update).withOptimisticUpdate(
+    (localStore, { shotId, data }) => {
+      const currentValue = localStore.getQuery(api.shots.get, { id: shotId })
+      if (!currentValue) {
+        return
+      }
+      localStore.setQuery(api.shots.get, { id: shotId }, {
+        ...currentValue,
+        status: data.status ?? currentValue.status,
+        lockedNumber: data.lockedNumber ?? currentValue.lockedNumber,
+        description: data.description ?? currentValue.description,
+        location: data.location ?? currentValue.location,
+        notes: data.notes ?? currentValue.notes,
+      })
+    },
+  )
+  const deleteShot = useMutation(api.shots.deleteShot)
+
   const shotFullCode = shotCode(sceneNumber, shotNumber)
 
-  const lockAndCopyShotCode = () => {
+  const lockAndCopyShotCode = async () => {
+    if (!shot) throw Error('Shot not loaded')
     if (shot.lockedNumber === null) {
-      onUpdate({...shot, lockedNumber: shotNumber})
+      await updateShot({ shotId, data: { lockedNumber: shotNumber } })
     }
     const copyPromise = clipboard.write(shotFullCode)
     void toast.promise(copyPromise, {
@@ -41,14 +59,15 @@ export function ShotTableRow({
     })
   }
 
-  const editShotCode = () => {
+  const editShotCode = async () => {
+    if (!shot) throw Error('Shot not loaded')
     if (shot.lockedNumber === null) {
       throw Error('Shotcode not locked')
     }
     const newShotCode = window.prompt('Enter new shot code. Clear and Confirm to unlock shot code.', shot.lockedNumber.toString())
     if (newShotCode !== null) {
       if (newShotCode.trim().length === 0) {
-        onUpdate({...shot, lockedNumber: null})
+        await updateShot({ shotId, data: { lockedNumber: null } })
         return
       }
       const parsed = parseInt(newShotCode)
@@ -56,49 +75,54 @@ export function ShotTableRow({
         throw Error('Invalid shotcode: ' + newShotCode)
       }
       if (parsed !== shot.lockedNumber) {
-        onUpdate({...shot, lockedNumber: parsed})
+        await updateShot({ shotId, data: { lockedNumber: parsed } })
       }
       void clipboard.write(sceneNumber.toString() + '-' + parsed.toString())
     }
   }
 
-  const cycleStatus = () => {
+  const cycleStatus = async () => {
+    if (!shot) throw Error('Shot not loaded')
     const next = nextStatus(shot.status)
     const lockedNumber = (next === 'animated' || next === 'wip') && shot.lockedNumber === null
       ? shotNumber
       : shot.lockedNumber
-    onUpdate({...shot, status: next, lockedNumber})
+    await updateShot({ shotId, data: { status: next, lockedNumber } })
   }
 
-  const onStatusRightClicked = () => {
+  const onStatusRightClicked = async () => {
+    if (!shot) throw Error('Shot not loaded')
     const status = shot.status === 'animated'
       ? 'default'
       : shot.status === 'unsure'
         ? 'default'
         : 'unsure'
-    onUpdate({...shot, status})
+    await updateShot({ shotId, data: { status } })
   }
+
+  if (!shot) return null
 
   return (
     <>
       <div
-        className={'col-start-1 grid grid-flow-col place-content-start items-center pl-2 group relative' + (shot.status === 'wip' ? ' !bg-purple-900' : '')}>
+        className={'col-start-1 grid grid-flow-col place-content-start items-center pl-2 group relative' + (shot.status === 'wip' ? ' !bg-purple-900' : '')}
+      >
         {showAddBeforeButton && <button
           className={'absolute top-0 left-0 -translate-x-[100%] -translate-y-1/2 opacity-0 group-hover:opacity-100'}
           onClick={onAddBefore}
         >
-          <Icon code={'add'}/>
+          <Icon code={'add'} />
         </button>}
         {showSwapButton && <button
-            className={'absolute top-0 left-0 -translate-x-[200%] -translate-y-1/2 opacity-0 group-hover:opacity-100'}
-            onClick={onSwapWithPrevious}
+          className={'absolute top-0 left-0 -translate-x-[200%] -translate-y-1/2 opacity-0 group-hover:opacity-100'}
+          onClick={onSwapWithPrevious}
         >
-            <Icon code={'swap_vert'}/>
+          <Icon code={'swap_vert'} />
         </button>}
         <button
-          onClick={cycleStatus}
+          onClick={() => void cycleStatus()}
           onContextMenu={event => {
-            onStatusRightClicked()
+            void onStatusRightClicked()
             event.preventDefault()
           }}
           className={shot.status === 'wip' ? 'text-slate-300 hover:text-slate-100' : 'text-slate-500 hover:text-slate-100'}
@@ -106,10 +130,10 @@ export function ShotTableRow({
           data-tooltip-html={statusTooltip(shot.status)}
           data-tooltip-place={'bottom'}
         >
-          <Icon code={statusIconCode(shot.status)}/>
+          <Icon code={statusIconCode(shot.status)} />
         </button>
         <button
-          onClick={lockAndCopyShotCode}
+          onClick={() => void lockAndCopyShotCode()}
           className={'p-2 pr-0 text-sm flex flex-row items-center ' + (shot.lockedNumber != null ? 'text-slate-300 hover:text-slate-100' : 'text-slate-500 hover:text-slate-100')}
           data-tooltip-id={'tooltip'}
           data-tooltip-content={'Click to copy'}
@@ -117,51 +141,51 @@ export function ShotTableRow({
         >
           {shotFullCode}
           {shot.lockedNumber === null &&
-              <Icon
-                  code={'lock'}
-                  className={'icon-size-20 opacity-0 group-hover:opacity-100 pl-1'}
-              />
+            <Icon
+              code={'lock'}
+              className={'icon-size-20 opacity-0 group-hover:opacity-100 pl-1'}
+            />
           }
         </button>
         {shot.lockedNumber !== null &&
-            <button
-                onClick={editShotCode}
-                className={'p-2 pl-1 flex flex-row items-center opacity-0 group-hover:opacity-100'}
-                data-tooltip-id={'tooltip'}
-                data-tooltip-content={'Edit Shotcode'}
-                data-tooltip-place={'bottom'}
-            >
-                <Icon
-                    code={'edit'}
-                    className={'icon-size-20 text-slate-500 hover:text-slate-100'}
-                />
-            </button>
+          <button
+            onClick={() => void editShotCode()}
+            className={'p-2 pl-1 flex flex-row items-center opacity-0 group-hover:opacity-100'}
+            data-tooltip-id={'tooltip'}
+            data-tooltip-content={'Edit Shotcode'}
+            data-tooltip-place={'bottom'}
+          >
+            <Icon
+              code={'edit'}
+              className={'icon-size-20 text-slate-500 hover:text-slate-100'}
+            />
+          </button>
         }
       </div>
       <EditableTextCell
         column={'col-start-3'}
         value={shot.location ?? ''}
         className={shot.status !== 'animated' ? 'text-slate-200' : 'text-slate-500'}
-        onUpdate={value => onUpdate({...shot, location: value.trim() === '' ? null : value})}
+        onUpdate={value => void updateShot({ shotId, data: { location: value.trim() === '' ? null : value } })}
       />
       <EditableTextCell
         column={'col-start-4'}
         value={shot.description}
         className={shot.status !== 'animated' ? 'text-slate-200' : 'text-slate-500'}
-        onUpdate={value => onUpdate({...shot, description: value})}
+        onUpdate={value => void updateShot({ shotId, data: { description: value } })}
       />
       <EditableTextCell
         column={'col-start-5'}
         value={shot.notes}
         className={shot.status !== 'animated' ? 'text-slate-200' : 'text-slate-500'}
-        onUpdate={value => onUpdate({...shot, notes: value})}
+        onUpdate={value => void updateShot({ shotId, data: { notes: value } })}
       />
       <div className="col-start-6 self-stretch hover:bg-red-900">
         <button
-          onClick={onDelete}
+          onClick={() => void deleteShot({ shotId })}
           className={'p-2 text-sm text-slate-500 hover:text-red-100 h-full'}
         >
-          <Icon code={'delete_forever'}/>
+          <Icon code={'delete_forever'} />
         </button>
       </div>
     </>

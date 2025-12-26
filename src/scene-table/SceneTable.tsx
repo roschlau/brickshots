@@ -1,9 +1,11 @@
-import {SceneData} from '../data-model/scene.ts'
-import {getSceneNumber, nextShotAutoNumber} from '../data-model/codes.ts'
-import {newShot, ShotData} from '../data-model/shot.ts'
-import {ShotTableRow} from './ShotTableRow.tsx'
-import {Icon} from '../ui-atoms/Icon.tsx'
-import {ShotStatus} from '../data-model/shot-status.ts'
+import { getSceneNumber, nextShotAutoNumber } from '../data-model/codes.ts'
+import { ShotData } from '../data-model/shot.ts'
+import { ShotTableRow } from './ShotTableRow.tsx'
+import { Icon } from '../ui-atoms/Icon.tsx'
+import { ShotStatus } from '../data-model/shot-status.ts'
+import { Doc } from '../../convex/_generated/dataModel'
+import { useMutation, useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 
 interface ShotViewModel {
   indexInScene: number,
@@ -11,27 +13,39 @@ interface ShotViewModel {
   shotData: ShotData
 }
 
-export function SceneTable({scene, sceneIndex, shotStatusFilter, onUpdate, onDelete, backupProject}: {
-  scene: SceneData,
+export function SceneTable({ sceneId, sceneIndex, shotStatusFilter }: {
+  sceneId: Doc<'scenes'>['_id']
   sceneIndex: number,
   shotStatusFilter: ShotStatus[],
-  onUpdate: (scene: SceneData) => void,
-  onDelete: () => void,
-  backupProject: (reason: string) => void,
 }) {
-  const lockedShotNumbers = scene.shots.map(it => it.lockedNumber).filter((it): it is number => it !== null)
+  const scene = useQuery(api.scenes.get, { id: sceneId })
+  const shots = useQuery(api.shots.getForScene, { sceneId }) ?? []
+  const createShot = useMutation(api.shots.create)
+  const updateScene = useMutation(api.scenes.update).withOptimisticUpdate(
+    (localStore, { sceneId, data }) => {
+      const currentValue = localStore.getQuery(api.scenes.get, { id: sceneId })
+      if (!currentValue) {
+        return
+      }
+      localStore.setQuery(api.scenes.get, { id: sceneId }, {
+        ...currentValue,
+        lockedNumber: data.lockedNumber ?? currentValue.lockedNumber,
+        description: data.description ?? currentValue.description,
+      })
+    },
+  )
+  const deleteScene = useMutation(api.scenes.deleteScene)
+
+  const lockedShotNumbers = shots.map(it => it.lockedNumber).filter((it): it is number => it !== null)
   const shotNumbers: Record<number, number> = {}
-  const sceneNumber = getSceneNumber(scene, sceneIndex)
-  const addNewShot = (index: number) => {
-    const shot = newShot({location: (scene.shots[index - 1] ?? scene.shots[index])?.location})
-    const newShots = [...scene.shots]
-    newShots.splice(index, 0, shot)
-    onUpdate({
-      ...scene,
-      shots: newShots,
-    })
+  const sceneNumber = getSceneNumber(scene ?? { lockedNumber: null }, sceneIndex)
+  const addNewShot = async (index: number) => {
+    const shotId = await createShot({ sceneId, location: (shots[index - 1] ?? shots[index])?.location ?? undefined })
+    const newShotOrder = scene?.shotOrder.slice() ?? []
+    newShotOrder.splice(index, 0, shotId)
+    await updateScene({ sceneId, data: { shotOrder: newShotOrder } })
   }
-  const shotViewModels = scene.shots
+  const shotViewModels = shots
     .map((shot, shotIndex) => {
       const shotNumber = shot.lockedNumber ?? nextShotAutoNumber(shotNumbers[shotIndex - 1] ?? 0, lockedShotNumbers)
       shotNumbers[shotIndex] = shotNumber
@@ -42,55 +56,36 @@ export function SceneTable({scene, sceneIndex, shotStatusFilter, onUpdate, onDel
       } satisfies ShotViewModel
     })
   const shotTableRows = shotViewModels
-    .filter(({shotData}) => shotStatusFilter.length === 0 || shotStatusFilter.includes(shotData.status))
+    .filter(({ shotData }) => shotStatusFilter.length === 0 || shotStatusFilter.includes(shotData.status))
     .map(({ shotData, indexInScene, shotNumber }) => {
-      const updateShot = (updatedShot: ShotData) => {
-        console.trace('Shot updated', indexInScene, updatedShot)
-        onUpdate({
-          ...scene,
-          lockedNumber: updatedShot.lockedNumber && !scene.lockedNumber ? sceneNumber : scene.lockedNumber,
-          shots: scene.shots.map((oldShot, i) => i === indexInScene ? updatedShot : oldShot),
-        })
-      }
-      const deleteShot = () => {
-        backupProject('before-shot-deletion')
-        onUpdate({
-          ...scene,
-          shots: scene.shots.filter((_, i) => i !== indexInScene),
-        })
-      }
-      const swapWithPrevious = () => {
-        const previous = scene.shots[indexInScene - 1]
-        const current = scene.shots[indexInScene]
+      const swapWithPrevious = async () => {
+        if (!scene) {
+          throw Error()
+        }
+        const newShotOrder = scene.shotOrder.slice()
+        const previous = newShotOrder[indexInScene - 1]
+        const current = newShotOrder[indexInScene]
         if (current === undefined || previous === undefined) {
           throw Error()
         }
-        onUpdate({
-          ...scene,
-          shots: scene.shots.map((shot, i) =>
-            i === indexInScene - 1
-              ? current
-              : i === indexInScene
-                ? previous
-                : shot),
-        })
+        newShotOrder[indexInScene - 1] = current
+        newShotOrder[indexInScene] = previous
+        await updateScene({ sceneId, data: { shotOrder: newShotOrder }})
       }
       return (
         <ShotTableRow
-          key={shotNumber}
-          shot={shotData}
+          key={shotData._id}
+          shotId={shotData._id}
           sceneNumber={sceneNumber}
           shotNumber={shotNumber}
           showAddBeforeButton={shotStatusFilter.length === 0}
           showSwapButton={indexInScene > 0 && shotStatusFilter.length === 0}
-          onUpdate={updateShot}
-          onDelete={deleteShot}
-          onAddBefore={() => addNewShot(indexInScene)}
-          onSwapWithPrevious={swapWithPrevious}
+          onAddBefore={() => void addNewShot(indexInScene)}
+          onSwapWithPrevious={() => void swapWithPrevious()}
         />
       )
     })
-  return shotTableRows.length === 0 && scene.shots.length !== 0 ? null : (
+  return shotTableRows.length === 0 && shots.length !== 0 ? null : (
     <>
       <div
         id={'scene-' + sceneNumber.toString()}
@@ -102,21 +97,22 @@ export function SceneTable({scene, sceneIndex, shotStatusFilter, onUpdate, onDel
         <input
           type={'text'}
           className={'grow self-stretch my-0.5 p-2 font-bold text-lg rounded bg-transparent border-none placeholder:font-normal'}
-          value={scene.description}
+          value={scene?.description ?? ''}
           placeholder={'No description'}
-          onChange={(event) => onUpdate({...scene, description: event.target.value})}
+          onChange={(event) => void updateScene({ sceneId, data: { description: event.target.value } }) }
         />
         <button
           className={'p-2 text-sm text-slate-500 hover:text-red-100 hover:bg-red-900 self-stretch'}
-          onClick={onDelete}
+          onClick={() => void deleteScene({ sceneId })}
         >
-          <Icon code={'delete_forever'}/>
+          <Icon code={'delete_forever'} />
         </button>
       </div>
       {shotTableRows}
       <button
         className={'col-start-1 col-span-full mb-4 rounded-b-md p-2 pb-3 text-start text-slate-300 hover:text-slate-100 hover:bg-slate-700'}
-        onClick={() => addNewShot(scene.shots.length)}>
+        onClick={() => void addNewShot(shots.length)}
+      >
         + Add Shot
       </button>
     </>
