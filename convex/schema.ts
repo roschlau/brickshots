@@ -1,11 +1,14 @@
 import { defineSchema, defineTable } from 'convex/server'
 import { v } from 'convex/values'
 import { vShotStatus } from '../src/data-model/shot-status'
+import { authTables } from '@convex-dev/auth/server'
 
 export default defineSchema({
+  ...authTables,
   projects: defineTable({
     name: v.string(),
-  }),
+    owner: v.id('users'),
+  }).index('by_owner', ['owner']),
   scenes: defineTable({
     project: v.id('projects'),
     lockedNumber: v.union(v.number(), v.null()),

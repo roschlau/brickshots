@@ -4,7 +4,8 @@ import App from './App.tsx'
 import { Toaster } from 'react-hot-toast'
 import { Tooltip } from 'react-tooltip'
 import './index.css'
-import { ConvexProvider, ConvexReactClient } from 'convex/react'
+import { ConvexReactClient } from 'convex/react'
+import { ConvexAuthProvider } from '@convex-dev/auth/react'
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string)
 
@@ -14,12 +15,12 @@ if (!root) {
 }
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
-    <ConvexProvider client={convex}>
+    <ConvexAuthProvider client={convex}>
       <div className={'flex flex-col items-center isolate'}>
         <App />
       </div>
       <Toaster />
       <Tooltip id={'tooltip'} />
-    </ConvexProvider>
+    </ConvexAuthProvider>
   </React.StrictMode>,
 )

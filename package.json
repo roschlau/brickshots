@@ -11,10 +11,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@auth/core": "0.37.0",
+    "@convex-dev/auth": "^0.0.90",
     "@eslint/js": "^8.57.0",
     "@headlessui/react": "^2.0.4",
     "clipboardy": "^4.0.0",
     "convex": "^1.31.2",
+    "convex-helpers": "^0.1.108",
     "eslint-plugin-react": "^7.34.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

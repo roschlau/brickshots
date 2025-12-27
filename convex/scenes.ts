@@ -1,51 +1,58 @@
 import { mutation, query } from './_generated/server'
 import { v } from 'convex/values'
 import { api } from './_generated/api'
+import { editProject, editScene, withPermission } from './auth'
 
 export const getForProjectWithShots = query({
   args: {
-    projectId: v.optional(v.id('projects')),
+    projectId: v.id('projects'),
   },
-  handler: async (ctx, { projectId }) => {
-    if (!projectId) return []
-    const scenes = await ctx.db
-      .query('scenes')
-      .withIndex('by_project', (q) => q.eq('project', projectId))
-      .collect()
-    return await Promise.all(scenes.map(async scene => {
-      const shots = await ctx.db
-        .query('shots')
-        .withIndex('by_scene', (q) => q.eq('scene', scene._id))
+  handler: (ctx, { projectId }) => withPermission(ctx,
+    editProject(projectId),
+    async ({ project }) => {
+      const scenes = await ctx.db
+        .query('scenes')
+        .withIndex('by_project', (q) => q.eq('project', project._id))
         .collect()
-      return {
-        ...scene,
-        shots,
-      }
-    }))
-  },
+      return await Promise.all(scenes.map(async scene => {
+        const shots = await ctx.db
+          .query('shots')
+          .withIndex('by_scene', (q) => q.eq('scene', scene._id))
+          .collect()
+        return {
+          ...scene,
+          shots,
+        }
+      }))
+    },
+  ),
 })
 
 export const get = query({
   args: {
     id: v.id('scenes'),
   },
-  handler: async (ctx, args) => {
-    return await ctx.db.get('scenes', args.id)
-  },
+  handler: (ctx, args) => withPermission(ctx,
+    editScene(args.id),
+    ({ scene }) => Promise.resolve(scene),
+  ),
 })
 
 export const create = mutation({
   args: {
     projectId: v.id('projects'),
   },
-  handler: async (ctx, { projectId }) => {
-    return await ctx.db.insert('scenes', {
-      project: projectId,
-      lockedNumber: null,
-      description: '',
-      shotOrder: [],
-    })
-  },
+  handler: (ctx, { projectId }) => withPermission(ctx,
+    editProject(projectId),
+    async ({ project }) => {
+      return await ctx.db.insert('scenes', {
+        project: project._id,
+        lockedNumber: null,
+        description: '',
+        shotOrder: [],
+      })
+    },
+  ),
 })
 
 export const update = mutation({
@@ -55,25 +62,31 @@ export const update = mutation({
       lockedNumber: v.optional(v.union(v.number(), v.null())),
       description: v.optional(v.string()),
       shotOrder: v.optional(v.array(v.id('shots'))),
-    })
+    }),
   },
-  handler: async (ctx, { sceneId, data }) => {
-    await ctx.db.patch(sceneId, data)
-  },
+  handler: (ctx, { sceneId, data }) => withPermission(ctx,
+    editScene(sceneId),
+    async ({ scene }) => {
+      await ctx.db.patch(scene._id, data)
+    },
+  ),
 })
 
 export const deleteScene = mutation({
   args: {
     sceneId: v.id('scenes'),
   },
-  handler: async (ctx, { sceneId }) => {
-    const shots = await ctx.db
-      .query('shots')
-      .withIndex('by_scene', (q) => q.eq('scene', sceneId))
-      .collect()
-    for (const shot of shots) {
-      await ctx.runMutation(api.shots.deleteShot, { shotId: shot._id })
-    }
-    await ctx.db.delete(sceneId)
-  }
+  handler: (ctx, { sceneId }) => withPermission(ctx,
+    editScene(sceneId),
+    async ({ scene }) => {
+      const shots = await ctx.db
+        .query('shots')
+        .withIndex('by_scene', (q) => q.eq('scene', scene._id))
+        .collect()
+      for (const shot of shots) {
+        await ctx.runMutation(api.shots.deleteShot, { shotId: shot._id })
+      }
+      await ctx.db.delete(sceneId)
+    },
+  ),
 })

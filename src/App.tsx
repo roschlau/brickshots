@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
 import { getSceneNumber } from './data-model/codes.ts'
 import { SceneTable } from './scene-table/SceneTable.tsx'
@@ -6,21 +6,30 @@ import { ShotStatus } from './data-model/shot-status.ts'
 import { StatusFilterSelector } from './StatusFilterSelector.tsx'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../convex/_generated/api'
+import { AccountControls } from './AccountControls.tsx'
+import { Id } from '../convex/_generated/dataModel'
 
 function App() {
-  // Project State
   const project = useQuery(api.projects.getAll)?.[0]
-  const projectScenes = useQuery(api.scenes.getForProjectWithShots, { projectId: project?._id }) ?? []
-  const createScene = useMutation(api.scenes.create)
-  useEffect(() => localStorage.setItem('project', JSON.stringify(project)), [project])
+  if (project) {
+    return <Project projectId={project._id} />
+  } else {
+    return <>
+      <AccountControls/>
+      <div>No Projects</div>
+    </>
+  }
+}
 
-  // UI State
+function Project({ projectId }: { projectId: Id<'projects'>}) {
+  const projectScenes = useQuery(api.scenes.getForProjectWithShots, { projectId }) ?? []
+  const createScene = useMutation(api.scenes.create)
+
   const [statusFilter, setStatusFilter] = useState<ShotStatus[]>([])
 
   // Scenes
   const addScene = async () => {
-    if (!project) throw Error('No project')
-    await createScene({ projectId: project._id })
+    await createScene({ projectId })
   }
 
   const scenes = projectScenes.map((scene, sceneIndex) => {
@@ -54,17 +63,14 @@ function App() {
     )
   })
 
-  // Component
   return (
     <>
-      <div>
-        {projectScenes.map(it => it.lockedNumber)}
-      </div>
       <div className={'w-full max-w-screen-xl top-0 sticky z-10 flex flex-col pb-4 items-start bg-slate-800'}>
         <div className={'w-full flex flex-row items-center mb-4'}>
           <h1 className="text-3xl my-4 grow">
             BrickShot
           </h1>
+          <AccountControls/>
         </div>
         <div className={'self-stretch flex flex-row items-center'}>
           <div className={'grow flex flex-row items-center'}>

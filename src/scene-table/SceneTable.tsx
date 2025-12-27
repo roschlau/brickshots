@@ -41,6 +41,9 @@ export function SceneTable({ sceneId, sceneIndex, shotStatusFilter }: {
   const sceneNumber = getSceneNumber(scene ?? { lockedNumber: null }, sceneIndex)
   const addNewShot = async (index: number) => {
     const shotId = await createShot({ sceneId, location: (shots[index - 1] ?? shots[index])?.location ?? undefined })
+    if (!shotId) {
+      throw Error('Shot could not be created')
+    }
     const newShotOrder = scene?.shotOrder.slice() ?? []
     newShotOrder.splice(index, 0, shotId)
     await updateScene({ sceneId, data: { shotOrder: newShotOrder } })
