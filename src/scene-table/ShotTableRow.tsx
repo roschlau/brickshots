@@ -105,10 +105,10 @@ export function ShotTableRow({
   return (
     <>
       <div
-        className={'col-start-1 grid grid-flow-col place-content-start items-center pl-2 group relative' + (shot.status === 'wip' ? ' !bg-purple-900' : '')}
+        className={'col-start-1 grid grid-flow-col place-content-start items-center pl-2 group relative' + (shot.status === 'wip' ? ' bg-purple-900!' : '')}
       >
         {showAddBeforeButton && <button
-          className={'absolute top-0 left-0 -translate-x-[100%] -translate-y-1/2 opacity-0 group-hover:opacity-100'}
+          className={'absolute top-0 left-0 -translate-x-full -translate-y-1/2 opacity-0 group-hover:opacity-100'}
           onClick={onAddBefore}
         >
           <Icon code={'add'} />

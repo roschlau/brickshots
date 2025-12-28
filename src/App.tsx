@@ -52,7 +52,7 @@ function Project({ projectId }: { projectId: Id<'projects'>}) {
       <a
         key={sceneNumber}
         href={'#scene-' + sceneNumber.toString()}
-        className={'py-1 px-2 rounded ' +
+        className={'py-1 px-2 rounded-sm ' +
           (isDone ? 'text-slate-500' : 'text-slate-200') + ' hover:text-slate-100 ' +
           (hasWipShots ? 'bg-purple-800 hover:bg-purple-700' : 'hover:bg-slate-700')}
         data-tooltip-id={'tooltip'}
@@ -65,7 +65,7 @@ function Project({ projectId }: { projectId: Id<'projects'>}) {
 
   return (
     <>
-      <div className={'w-full max-w-screen-xl top-0 sticky z-10 flex flex-col pb-4 items-start bg-slate-800'}>
+      <div className={'w-full max-w-(--breakpoint-xl) top-0 sticky z-10 flex flex-col pb-4 items-start bg-slate-800'}>
         <div className={'w-full flex flex-row items-center mb-4'}>
           <h1 className="text-3xl my-4 grow">
             BrickShot
@@ -83,9 +83,9 @@ function Project({ projectId }: { projectId: Id<'projects'>}) {
         </div>
       </div>
       <div
-        className="w-full max-w-screen-xl grid mb-10
+        className="w-full max-w-(--breakpoint-xl) grid mb-10
                    justify-stretch justify-items-stretch items-stretch
-                   p-[1px] gap-[1px] bg-slate-800 *:bg-slate-900"
+                   p-px gap-px bg-slate-800 *:bg-slate-900"
         style={{ gridTemplateColumns: 'auto auto auto 1fr 1fr auto' }}
       >
         {scenes}
