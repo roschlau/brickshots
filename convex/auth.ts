@@ -1,5 +1,6 @@
 import { convexAuth, getAuthUserId } from '@convex-dev/auth/server'
 import GitHub from '@auth/core/providers/github'
+import { ConvexError } from 'convex/values'
 import { Id } from './_generated/dataModel'
 import { QueryCtx } from './_generated/server'
 
@@ -37,6 +38,11 @@ export async function withPermission<A, T>(
   handler: (authResult: NonNullable<A>) => Promise<T>,
 ): Promise<T | null> {
   const permissionResult = await permission(ctx)
-  if (!permissionResult) return null
+  if (!permissionResult) {
+    throw new ConvexError({
+      code: "unauthorized",
+      msg: "A required resource does not exist or you do not have permission to perform this action.",
+    })
+  }
   return handler(permissionResult)
 }
