@@ -1,5 +1,8 @@
 import { useAuthActions } from '@convex-dev/auth/react'
 import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react'
+import { Button } from '@/components/ui/button.tsx'
+import { GithubIcon } from '@/icons/GithubIcon.tsx'
+import { LogOutIcon } from 'lucide-react'
 
 export function AccountControls() {
   const { signIn, signOut } = useAuthActions()
@@ -7,10 +10,19 @@ export function AccountControls() {
     <>
       <AuthLoading>Loading...</AuthLoading>
       <Unauthenticated>
-        <button onClick={() => void signIn('github')}>Sign in with GitHub</button>
+        <Button onClick={() => void signIn('github')}>
+          <GithubIcon/>
+          Sign in with GitHub
+        </Button>
       </Unauthenticated>
       <Authenticated>
-        <button onClick={() => void signOut()}>Sign out</button>
+        <Button
+          onClick={() => void signOut()}
+          variant="outline"
+        >
+          <LogOutIcon/>
+          Sign out
+        </Button>
       </Authenticated>
     </>
   )

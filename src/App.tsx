@@ -54,7 +54,7 @@ function Project({ projectId }: { projectId: Id<'projects'>}) {
         href={'#scene-' + sceneNumber.toString()}
         className={'py-1 px-2 rounded-sm ' +
           (isDone ? 'text-slate-500' : 'text-slate-200') + ' hover:text-slate-100 ' +
-          (hasWipShots ? 'bg-purple-800 hover:bg-purple-700' : 'hover:bg-slate-700')}
+          (hasWipShots ? 'bg-accent hover:bg-accent/80' : 'hover:bg-foreground/20')}
         data-tooltip-id={'tooltip'}
         data-tooltip-content={scene.description || ('Scene ' + sceneNumber.toString())}
       >
@@ -65,7 +65,7 @@ function Project({ projectId }: { projectId: Id<'projects'>}) {
 
   return (
     <>
-      <div className={'w-full max-w-(--breakpoint-xl) top-0 sticky z-10 flex flex-col pb-4 items-start bg-slate-800'}>
+      <div className={'w-full max-w-(--breakpoint-xl) top-0 sticky z-10 flex flex-col pb-4 items-start'}>
         <div className={'w-full flex flex-row items-center mb-4'}>
           <h1 className="text-3xl my-4 grow">
             BrickShot
@@ -85,12 +85,12 @@ function Project({ projectId }: { projectId: Id<'projects'>}) {
       <div
         className="w-full max-w-(--breakpoint-xl) grid mb-10
                    justify-stretch justify-items-stretch items-stretch
-                   p-px gap-px bg-slate-800 *:bg-slate-900"
+                   p-px gap-px *:bg-card"
         style={{ gridTemplateColumns: 'auto auto auto 1fr 1fr auto' }}
       >
         {scenes}
         <button
-          className={'col-start-1 col-span-full mt-4 rounded-md text-start p-2 text-slate-300 hover:text-slate-100 hover:bg-slate-700'}
+          className={'col-start-1 col-span-full mt-4 rounded-md text-start p-2 text-slate-300 hover:text-slate-100 hover:bg-background'}
           onClick={() => void addScene()}
         >
           + Add Scene

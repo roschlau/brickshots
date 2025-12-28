@@ -15,6 +15,7 @@
     "@convex-dev/auth": "^0.0.90",
     "@eslint/js": "^8.57.0",
     "@headlessui/react": "^2.0.4",
+    "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clipboardy": "^4.0.0",
     "clsx": "^2.1.1",
