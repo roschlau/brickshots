@@ -10,6 +10,12 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 
 export type Permission<T> = (ctx: QueryCtx) => Promise<T | null>
 
+export const isLoggedIn = async (ctx: QueryCtx) => {
+  const userId = await getAuthUserId(ctx)
+  if (userId === null) return null
+  return { userId }
+}
+
 export const editProject = (projectId: Id<'projects'>) => async (ctx: QueryCtx) => {
   const project = await ctx.db.get('projects', projectId)
   if (!project || project.owner !== await getAuthUserId(ctx)) return null

@@ -8,18 +8,28 @@ import { useMutation, useQuery } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import { AccountControls } from './AccountControls.tsx'
 import { Id } from '../convex/_generated/dataModel'
-import { ProjectsEmptyState } from '@/components/projects/ProjectsEmptyState.tsx'
+import { Projects } from '@/components/projects/Projects.tsx'
+import { Button } from '@/components/ui/button.tsx'
 
 function App() {
-  const project = useQuery(api.projects.getAll)?.[0]
-  if (project) {
-    return <Project projectId={project._id} />
+  const [openedProjectId, setOpenedProjectId] = useState(null as Id<'projects'> | null)
+  if (openedProjectId) {
+    return <Project
+      projectId={openedProjectId}
+      onCloseProjectClicked={() => setOpenedProjectId(null)}
+    />
   } else {
-    return <ProjectsEmptyState/>
+    return <Projects onProjectSelected={setOpenedProjectId}/>
   }
 }
 
-function Project({ projectId }: { projectId: Id<'projects'>}) {
+function Project({
+  projectId,
+  onCloseProjectClicked,
+}: {
+  projectId: Id<'projects'>,
+  onCloseProjectClicked: () => void,
+}) {
   const projectScenes = useQuery(api.scenes.getForProjectWithShots, { projectId }) ?? []
   const createScene = useMutation(api.scenes.create)
 
@@ -52,7 +62,7 @@ function Project({ projectId }: { projectId: Id<'projects'>}) {
         href={'#scene-' + sceneNumber.toString()}
         className={'py-1 px-2 rounded-sm ' +
           (isDone ? 'text-slate-500' : 'text-slate-200') + ' hover:text-slate-100 ' +
-          (hasWipShots ? 'bg-accent hover:bg-accent/80' : 'hover:bg-foreground/20')}
+          (hasWipShots ? 'bg-primary/50 hover:bg-primary/30' : 'hover:bg-foreground/20')}
         data-tooltip-id={'tooltip'}
         data-tooltip-content={scene.description || ('Scene ' + sceneNumber.toString())}
       >
@@ -64,10 +74,16 @@ function Project({ projectId }: { projectId: Id<'projects'>}) {
   return (
     <>
       <div className={'w-full max-w-(--breakpoint-xl) top-0 sticky z-10 flex flex-col pb-4 items-start'}>
-        <div className={'w-full flex flex-row items-center mb-4'}>
+        <div className={'w-full flex flex-row items-center mb-4 gap-2'}>
           <h1 className="text-3xl my-4 grow">
             BrickShot
           </h1>
+          <Button
+            variant={'outline'}
+            onClick={onCloseProjectClicked}
+          >
+            Close Project
+          </Button>
           <AccountControls/>
         </div>
         <div className={'self-stretch flex flex-row items-center'}>
