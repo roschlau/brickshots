@@ -8,16 +8,14 @@ import { useMutation, useQuery } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import { AccountControls } from './AccountControls.tsx'
 import { Id } from '../convex/_generated/dataModel'
+import { ProjectsEmptyState } from '@/components/projects/ProjectsEmptyState.tsx'
 
 function App() {
   const project = useQuery(api.projects.getAll)?.[0]
   if (project) {
     return <Project projectId={project._id} />
   } else {
-    return <>
-      <AccountControls/>
-      <div>No Projects</div>
-    </>
+    return <ProjectsEmptyState/>
   }
 }
 
