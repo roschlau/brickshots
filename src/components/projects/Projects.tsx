@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton.tsx'
 import { PlusIcon, TrashIcon } from 'lucide-react'
 import { AccountControls } from '@/AccountControls.tsx'
 import { Spinner } from '@/components/ui/spinner.tsx'
+import { SimpleTooltip } from '@/components/ui/tooltip.tsx'
 
 export function Projects({
   onProjectSelected,
@@ -18,7 +19,7 @@ export function Projects({
   const createProject = useMutation(api.projects.create)
   const deleteProject = useMutation(api.projects.deleteProject)
   if (!projects) {
-    return <Spinner className={'size-12'}/>
+    return <Spinner className={'size-12'} />
   }
   return projects.length === 0
     ? <ProjectsEmptyState onNewProjectClicked={() => void createProject()} />
@@ -28,7 +29,7 @@ export function Projects({
           <h1 className={'text-3xl my-4 grow'}>
             Your Projects
           </h1>
-          <AccountControls/>
+          <AccountControls />
           <Button
             className={'mb-4 self-end'}
             onClick={() => void createProject()}
@@ -44,7 +45,7 @@ export function Projects({
               projectId={project._id}
               projectName={project.name}
               onOpenClicked={() => onProjectSelected(project._id)}
-              onDeleteClicked={() => void deleteProject({projectId: project._id})}
+              onDeleteClicked={() => void deleteProject({ projectId: project._id })}
             />
           ))}
         </ul>
@@ -81,13 +82,15 @@ function ProjectTile({
           >
             Open
           </Button>
-          <Button
-            variant={'outline'}
-            onClick={onDeleteClicked}
-            className={'hover:text-destructive focus:text-destructive'}
-          >
-            <TrashIcon/>
-          </Button>
+          <SimpleTooltip text={'Delete Project'}>
+            <Button
+              variant={'outline'}
+              onClick={onDeleteClicked}
+              className={'hover:text-destructive focus:text-destructive'}
+            >
+              <TrashIcon />
+            </Button>
+          </SimpleTooltip>
         </ItemActions>
       </Item>
     </li>
