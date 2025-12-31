@@ -82,8 +82,9 @@ function ProjectTile({
             Open
           </Button>
           <Button
-            variant={'destructive'}
+            variant={'outline'}
             onClick={onDeleteClicked}
+            className={'hover:text-destructive focus:text-destructive'}
           >
             <TrashIcon/>
           </Button>
