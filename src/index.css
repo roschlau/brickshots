@@ -2,31 +2,10 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
-/*
-  ---break---
-*/
 @custom-variant dark (&:is(.dark *));
 
 @theme {
   --shadow-glow: 0 0px 6px, 0 0px 16px;
-}
-
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
-  }
 }
 
 :root {
@@ -74,39 +53,39 @@
   --sidebar-ring: oklch(0.704 0.04 256.788);
 }
 
-body {
-  /* https://react-tooltip.com/docs/getting-started#styling */
-  --rt-color-white: #f1f5f9;
-  --rt-color-dark: #020617;
-  --rt-color-success: #8dc572;
-  --rt-color-error: #be6464;
-  --rt-color-warning: #f0ad4e;
-  --rt-color-info: #337ab7;
-  --rt-opacity: 0.9;
-  --rt-transition-show-delay: 0.15s;
-  --rt-transition-closing-delay: 0.15s;
+.dark {
+  --background: oklch(0.208 0.042 265.755);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.129 0.042 264.695);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: var(--color-violet-400);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: var(--color-violet-500);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
 }
-
-:focus-visible, :focus + label {
-  @apply outline-solid outline-3 outline-offset-3 outline-primary;
-  animation: outline-bounce .4s ease-in-out;
-}
-
-@keyframes outline-bounce {
-  0% {
-    outline-width: 0;
-  }
-  40% {
-    outline-width: 5px;
-  }
-  100% {
-    outline-width: 3px;
-  }
-}
-
-/*
-  ---break---
-*/
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -149,47 +128,35 @@ body {
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/*
-  ---break---
-*/
-
-.dark {
-  --background: oklch(0.208 0.042 265.755);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.129 0.042 264.695);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: var(--color-violet-400);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: var(--color-violet-500);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+body {
+  /* https://react-tooltip.com/docs/getting-started#styling */
+  --rt-color-white: #f1f5f9;
+  --rt-color-dark: #020617;
+  --rt-color-success: #8dc572;
+  --rt-color-error: #be6464;
+  --rt-color-warning: #f0ad4e;
+  --rt-color-info: #337ab7;
+  --rt-opacity: 0.9;
+  --rt-transition-show-delay: 0.15s;
+  --rt-transition-closing-delay: 0.15s;
 }
 
-/*
-  ---break---
-*/
+:focus-visible, :focus + label {
+  @apply outline-solid outline-3 outline-offset-3 outline-primary;
+  animation: outline-bounce .4s ease-in-out;
+}
+
+@keyframes outline-bounce {
+  0% {
+    outline-width: 0;
+  }
+  40% {
+    outline-width: 5px;
+  }
+  100% {
+    outline-width: 3px;
+  }
+}
 
 @layer base {
   * {
