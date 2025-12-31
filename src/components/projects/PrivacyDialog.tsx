@@ -48,8 +48,8 @@ export function PrivacyDialog() {
         <p>
           Users can optionally log in with an external identity provider to more easily access their projects across devices,
           in which case limited user data like an email address, user name and a link to the identity provider are stored.
-          BrickShot does not store any passwords and does not gain access to the account you are logging in with.
-          The respective identity provider&#39;s terms privacy policy and terms apply to your usage of their services.
+          BrickShot does not store any passwords and does not gain access to the external account you are logging in with.
+          The respective identity provider&#39;s privacy policy and terms of use apply to your use of their services.
           Currently, GitHub is the only supported identity provider, more may be added in the future.
         </p>
         <p>
