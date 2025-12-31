@@ -9,6 +9,17 @@ import { PlusIcon, TrashIcon } from 'lucide-react'
 import { AccountControls } from '@/AccountControls.tsx'
 import { Spinner } from '@/components/ui/spinner.tsx'
 import { SimpleTooltip } from '@/components/ui/tooltip.tsx'
+import {
+  AlertDialog,
+  AlertDialogActionDestructive,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 
 export function Projects({
   onProjectSelected,
@@ -61,8 +72,8 @@ function ProjectTile({
 }: {
   projectId: Id<'projects'>,
   projectName: string,
-  onOpenClicked?: () => void,
-  onDeleteClicked?: () => void,
+  onOpenClicked: () => void,
+  onDeleteClicked: () => void,
 }) {
   const projectDetails = useQuery(api.projects.getDetails, { projectId })
   return (
@@ -83,16 +94,45 @@ function ProjectTile({
             Open
           </Button>
           <SimpleTooltip text={'Delete Project'}>
-            <Button
-              variant={'outline'}
-              onClick={onDeleteClicked}
-              className={'hover:text-destructive focus:text-destructive'}
-            >
-              <TrashIcon />
-            </Button>
+            <DeleteProjectButton projectName={projectName} onDeleteClicked={onDeleteClicked} />
           </SimpleTooltip>
         </ItemActions>
       </Item>
     </li>
+  )
+}
+
+function DeleteProjectButton({
+  projectName,
+  onDeleteClicked,
+}: {
+  projectName: string,
+  onDeleteClicked: () => void,
+}) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant={'outline'}
+          className={'hover:text-destructive focus:text-destructive'}
+        >
+          <TrashIcon />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Project &apos;{projectName}&apos;?</AlertDialogTitle>
+          <AlertDialogDescription>
+            The project and its data will be permanently deleted and can not be restored.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogActionDestructive onClick={onDeleteClicked}>
+            Continue
+          </AlertDialogActionDestructive>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
