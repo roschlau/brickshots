@@ -2,6 +2,7 @@ import { mutation, query } from './_generated/server'
 import { v } from 'convex/values'
 import { api } from './_generated/api'
 import { editProject, editScene, withPermission } from './auth'
+import { getManyFrom } from 'convex-helpers/server/relationships'
 
 export const getForProjectWithShots = query({
   args: {
@@ -10,15 +11,9 @@ export const getForProjectWithShots = query({
   handler: (ctx, { projectId }) => withPermission(ctx,
     editProject(projectId),
     async ({ project }) => {
-      const scenes = await ctx.db
-        .query('scenes')
-        .withIndex('by_project', (q) => q.eq('project', project._id))
-        .collect()
+      const scenes = await getManyFrom(ctx.db, 'scenes', 'by_project', project._id)
       return await Promise.all(scenes.map(async scene => {
-        const shots = await ctx.db
-          .query('shots')
-          .withIndex('by_scene', (q) => q.eq('scene', scene._id))
-          .collect()
+        const shots = await getManyFrom(ctx.db, 'shots', 'by_scene', scene._id)
         return {
           ...scene,
           shots,
@@ -79,10 +74,7 @@ export const deleteScene = mutation({
   handler: (ctx, { sceneId }) => withPermission(ctx,
     editScene(sceneId),
     async ({ scene }) => {
-      const shots = await ctx.db
-        .query('shots')
-        .withIndex('by_scene', (q) => q.eq('scene', scene._id))
-        .collect()
+      const shots = await getManyFrom(ctx.db, 'shots', 'by_scene', scene._id)
       for (const shot of shots) {
         await ctx.runMutation(api.shots.deleteShot, { shotId: shot._id })
       }

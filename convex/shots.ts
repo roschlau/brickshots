@@ -2,6 +2,7 @@ import { mutation, query } from './_generated/server'
 import { v } from 'convex/values'
 import { vShotStatus } from '../src/data-model/shot-status'
 import { editScene, editShot, withPermission } from './auth'
+import { getManyFrom } from 'convex-helpers/server/relationships'
 
 export const getForScene = query({
   args: {
@@ -10,10 +11,7 @@ export const getForScene = query({
   handler: (ctx, { sceneId }) => withPermission(ctx,
     editScene(sceneId),
     async () => {
-      return (await ctx.db
-        .query('shots')
-        .withIndex('by_scene', (q) => q.eq('scene', sceneId))
-        .collect())
+      return await getManyFrom(ctx.db, 'shots', 'by_scene', sceneId)
     },
   ),
 })
