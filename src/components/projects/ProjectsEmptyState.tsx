@@ -19,7 +19,9 @@ export function ProjectsEmptyState({
         <EmptyTitle>No Projects</EmptyTitle>
         <EmptyDescription>
           <Unauthenticated>
-            Creating projects anonymously is not yet supported. Sign in to open an existing project.
+            Creating projects anonymously is not yet supported
+            (see <a href="https://github.com/roschlau/brickshots/issues/13" target="_blank" rel="noreferrer">GitHub</a>).
+            Sign in to open an existing project.
           </Unauthenticated>
           <Authenticated>
             Create a new project to get started.
