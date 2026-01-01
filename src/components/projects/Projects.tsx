@@ -5,10 +5,9 @@ import { Id } from '../../../convex/_generated/dataModel'
 import { Button } from '@/components/ui/button.tsx'
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item.tsx'
 import { Skeleton } from '@/components/ui/skeleton.tsx'
-import { PlusIcon, TrashIcon } from 'lucide-react'
+import { EllipsisVerticalIcon, PlusIcon, TrashIcon } from 'lucide-react'
 import { AccountControls } from '@/AccountControls.tsx'
 import { Spinner } from '@/components/ui/spinner.tsx'
-import { SimpleTooltip } from '@/components/ui/tooltip.tsx'
 import {
   AlertDialog,
   AlertDialogActionDestructive,
@@ -18,8 +17,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu.tsx'
+import { useState } from 'react'
 
 export function Projects({
   onProjectSelected,
@@ -28,7 +33,6 @@ export function Projects({
 }) {
   const projects = useQuery(api.projects.getAll)
   const createProject = useMutation(api.projects.create)
-  const deleteProject = useMutation(api.projects.deleteProject)
   if (!projects) {
     return <Spinner className={'size-12'} />
   }
@@ -56,7 +60,6 @@ export function Projects({
               projectId={project._id}
               projectName={project.name}
               onOpenClicked={() => onProjectSelected(project._id)}
-              onDeleteClicked={() => void deleteProject({ projectId: project._id })}
             />
           ))}
         </ul>
@@ -68,14 +71,14 @@ function ProjectTile({
   projectId,
   projectName,
   onOpenClicked,
-  onDeleteClicked,
 }: {
   projectId: Id<'projects'>,
   projectName: string,
   onOpenClicked: () => void,
-  onDeleteClicked: () => void,
 }) {
   const projectDetails = useQuery(api.projects.getDetails, { projectId })
+  const deleteProject = useMutation(api.projects.deleteProject)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   return (
     <li>
       <Item variant={'outline'}>
@@ -93,32 +96,47 @@ function ProjectTile({
           >
             Open
           </Button>
-          <SimpleTooltip text={'Delete Project'}>
-            <DeleteProjectButton projectName={projectName} onDeleteClicked={onDeleteClicked} />
-          </SimpleTooltip>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant={'outline'}>
+                <EllipsisVerticalIcon />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align={'end'}>
+              <DropdownMenuItem
+                variant={'destructive'}
+                className={'no-default-focus-ring'}
+                onSelect={() => setDeleteDialogOpen(true)}
+              >
+                <TrashIcon/> Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </ItemActions>
+        <DeleteProjectDialog
+          open={deleteDialogOpen}
+          projectName={projectName}
+          onOpenChange={setDeleteDialogOpen}
+          onDeleteClicked={() => void deleteProject({ projectId })}
+        />
       </Item>
     </li>
   )
 }
 
-function DeleteProjectButton({
+function DeleteProjectDialog({
+  open,
   projectName,
+  onOpenChange,
   onDeleteClicked,
 }: {
+  open: boolean,
   projectName: string,
+  onOpenChange: (open: boolean) => void,
   onDeleteClicked: () => void,
 }) {
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button
-          variant={'outline'}
-          className={'hover:text-destructive focus:text-destructive'}
-        >
-          <TrashIcon />
-        </Button>
-      </AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Project &apos;{projectName}&apos;?</AlertDialogTitle>

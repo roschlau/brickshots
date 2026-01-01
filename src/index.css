@@ -141,7 +141,7 @@ body {
   --rt-transition-closing-delay: 0.15s;
 }
 
-:focus-visible, :focus + label {
+:focus-visible:not(.no-default-focus-ring), :focus + label {
   @apply outline-solid outline-3 outline-offset-3 outline-primary;
   animation: outline-bounce .4s ease-in-out;
 }
