@@ -30,6 +30,7 @@ function Project({
   projectId: Id<'projects'>,
   onCloseProjectClicked: () => void,
 }) {
+  const project = useQuery(api.projects.getDetails, { projectId })
   const projectScenes = useQuery(api.scenes.getForProjectWithShots, { projectId }) ?? []
   const createScene = useMutation(api.scenes.create)
 
@@ -76,7 +77,7 @@ function Project({
       <div className={'w-full max-w-(--breakpoint-xl) top-0 sticky z-10 flex flex-col pb-4 items-start'}>
         <div className={'w-full flex flex-row items-center mb-4 gap-2'}>
           <h1 className="text-3xl my-4 grow">
-            BrickShot
+            {project?.name}
           </h1>
           <Button
             variant={'outline'}
