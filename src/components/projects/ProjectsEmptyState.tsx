@@ -4,10 +4,11 @@ import { Authenticated, Unauthenticated } from 'convex/react'
 import { Button } from '@/components/ui/button.tsx'
 import { AccountControls } from '@/AccountControls.tsx'
 import { PrivacyDialog } from '@/components/projects/PrivacyDialog.tsx'
+import { SimpleTooltip } from '@/components/ui/tooltip.tsx'
 
 export function ProjectsEmptyState({
   onNewProjectClicked,
-} : {
+}: {
   onNewProjectClicked: () => void,
 }) {
   return (
@@ -21,7 +22,7 @@ export function ProjectsEmptyState({
           <Unauthenticated>
             Creating projects anonymously is not yet supported
             (see <a href="https://github.com/roschlau/brickshots/issues/13" target="_blank" rel="noreferrer">GitHub</a>).
-            Sign in to open an existing project.
+            Sign in to get started.
           </Unauthenticated>
           <Authenticated>
             Create a new project to get started.
@@ -37,14 +38,18 @@ export function ProjectsEmptyState({
             </Button>
           </Authenticated>
           <Unauthenticated>
-            <Button disabled>
-              <PlusIcon />
-              Create Project
-            </Button>
+            <SimpleTooltip text={'Log in to create a project'}>
+              <span>
+                <Button disabled>
+                  <PlusIcon />
+                  Create Project
+                </Button>
+              </span>
+            </SimpleTooltip>
           </Unauthenticated>
           <AccountControls variant={'secondary'} />
         </div>
-        <PrivacyDialog/>
+        <PrivacyDialog />
       </EmptyContent>
     </Empty>
   )
