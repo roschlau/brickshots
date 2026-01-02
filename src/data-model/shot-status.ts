@@ -1,5 +1,5 @@
 import { Doc } from '../../convex/_generated/dataModel'
-import { v } from 'convex/values'
+import { literals } from 'convex-helpers/validators'
 
 export const shotStatusValues = [
   'default',
@@ -8,12 +8,7 @@ export const shotStatusValues = [
   'animated',
 ] as const
 
-export const vShotStatus = v.union(
-  v.literal('default'),
-  v.literal('unsure'),
-  v.literal('wip'),
-  v.literal('animated'),
-)
+export const vShotStatus = literals(...shotStatusValues)
 
 export type ShotStatus = Doc<'shots'>['status']
 
