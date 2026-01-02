@@ -74,7 +74,7 @@ function Project({
 
   return (
     <>
-      <div className={'w-full max-w-(--breakpoint-xl) top-0 sticky z-10 flex flex-col pb-4 items-start'}>
+      <div className={'w-full max-w-(--breakpoint-xl) top-0 sticky z-10 flex flex-col px-6 pb-4 items-start'}>
         <div className={'w-full flex flex-row items-center mb-4 gap-2'}>
           <h1 className="text-3xl my-4 grow">
             {project?.name}
@@ -100,7 +100,7 @@ function Project({
       <div
         className="w-full max-w-(--breakpoint-xl) grid mb-10
                    justify-stretch justify-items-stretch items-stretch
-                   p-px gap-px *:bg-card"
+                   px-6 gap-px *:bg-card"
         style={{ gridTemplateColumns: 'auto auto auto 1fr 1fr auto' }}
       >
         {scenes}
