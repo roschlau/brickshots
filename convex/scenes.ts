@@ -40,12 +40,14 @@ export const create = mutation({
   handler: (ctx, { projectId }) => withPermission(ctx,
     editProject(projectId),
     async ({ project }) => {
-      return await ctx.db.insert('scenes', {
+      const sceneId = await ctx.db.insert('scenes', {
         project: project._id,
         lockedNumber: null,
         description: '',
         shotOrder: [],
       })
+      await ctx.runMutation(api.shots.create, { sceneId })
+      return sceneId
     },
   ),
 })

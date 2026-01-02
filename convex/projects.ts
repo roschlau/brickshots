@@ -33,10 +33,25 @@ export const create = mutation({
   handler: (ctx) => withPermission(ctx,
     isLoggedIn,
     async ({ userId }) => {
-      return await ctx.db.insert('projects', {
+      const projectId = await ctx.db.insert('projects', {
         owner: userId,
         name: 'New Project',
       })
+      await ctx.runMutation(api.scenes.create, { projectId })
+      return projectId
+    },
+  ),
+})
+
+export const update = mutation({
+  args: {
+    projectId: v.id('projects'),
+    data: v.object({ name: v.string() }),
+  },
+  handler: (ctx, { projectId, data }) => withPermission(ctx,
+    editProject(projectId),
+    async () => {
+      await ctx.db.patch('projects', projectId, data)
     },
   ),
 })
