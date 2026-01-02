@@ -165,19 +165,22 @@ export function ShotTableRow({
       <EditableTextCell
         column={'col-start-3'}
         value={shot.location ?? ''}
-        className={shot.status !== 'animated' ? 'text-slate-200' : 'text-slate-500'}
+        placeholder={'Add Location'}
+        className={shot.status === 'animated' ? 'opacity-50' : ''}
         onUpdate={value => void updateShot({ shotId, data: { location: value.trim() === '' ? null : value } })}
       />
       <EditableTextCell
         column={'col-start-4'}
         value={shot.description}
-        className={shot.status !== 'animated' ? 'text-slate-200' : 'text-slate-500'}
+        placeholder={'Add Description'}
+        className={shot.status === 'animated' ? 'opacity-50' : ''}
         onUpdate={value => void updateShot({ shotId, data: { description: value } })}
       />
       <EditableTextCell
         column={'col-start-5'}
         value={shot.notes}
-        className={shot.status !== 'animated' ? 'text-slate-200' : 'text-slate-500'}
+        placeholder={'Add Notes'}
+        className={shot.status === 'animated' ? 'opacity-50' : ''}
         onUpdate={value => void updateShot({ shotId, data: { notes: value } })}
       />
       <div className="col-start-6 self-stretch hover:bg-red-900">
