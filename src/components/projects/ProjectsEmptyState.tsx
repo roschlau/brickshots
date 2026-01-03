@@ -5,12 +5,9 @@ import { Button } from '@/components/ui/button.tsx'
 import { AccountControls } from '@/AccountControls.tsx'
 import { PrivacyDialog } from '@/components/projects/PrivacyDialog.tsx'
 import { SimpleTooltip } from '@/components/ui/tooltip.tsx'
+import { NewProjectButton } from '@/components/projects/NewProjectButton.tsx'
 
-export function ProjectsEmptyState({
-  onNewProjectClicked,
-}: {
-  onNewProjectClicked: () => void,
-}) {
+export function ProjectsEmptyState() {
   return (
     <Empty>
       <EmptyHeader>
@@ -31,11 +28,9 @@ export function ProjectsEmptyState({
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">
+          <AccountControls variant={'secondary'} />
           <Authenticated>
-            <Button onClick={onNewProjectClicked}>
-              <PlusIcon />
-              Create Project
-            </Button>
+            <NewProjectButton text={'Create Project'}/>
           </Authenticated>
           <Unauthenticated>
             <SimpleTooltip text={'Log in to create a project'}>
@@ -47,7 +42,6 @@ export function ProjectsEmptyState({
               </span>
             </SimpleTooltip>
           </Unauthenticated>
-          <AccountControls variant={'secondary'} />
         </div>
         <PrivacyDialog />
       </EmptyContent>

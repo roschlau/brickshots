@@ -4,6 +4,8 @@ import { v } from 'convex/values'
 import { editProject, isLoggedIn, withPermission } from './auth'
 import { getManyFrom } from 'convex-helpers/server/relationships'
 import { api } from './_generated/api'
+import { ProjectFile } from '../src/data-model/project-file'
+import { Id } from './_generated/dataModel'
 
 export const getAll = query({
   args: {},
@@ -68,4 +70,38 @@ export const deleteProject = mutation({
       await ctx.db.delete('projects', projectId)
     },
   ),
+})
+
+export const importProject = mutation({
+  args: {
+    project: ProjectFile,
+  },
+  handler: (ctx, { project }) => withPermission(ctx,
+    isLoggedIn,
+    async ({ userId }) => {
+      const projectId = await ctx.db.insert('projects', {
+        owner: userId,
+        name: project.name ?? 'Imported Project',
+      })
+      for (const scene of project.scenes) {
+        const sceneId = await ctx.db.insert('scenes', {
+          project: projectId,
+          lockedNumber: scene.lockedNumber ?? null,
+          description: scene.description,
+          shotOrder: []
+        })
+        const shotOrder: Id<'shots'>[] = []
+        for (const shot of scene.shots) {
+          shotOrder.push(await ctx.db.insert('shots', {
+            scene: sceneId,
+            status: shot.status,
+            lockedNumber: shot.lockedNumber ?? null,
+            description: shot.description,
+            location: shot.location,
+            notes: shot.notes,
+          }))
+        }
+        await ctx.db.patch(sceneId, { shotOrder })
+      }
+    })
 })

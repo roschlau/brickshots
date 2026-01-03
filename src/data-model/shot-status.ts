@@ -1,6 +1,3 @@
-import { Doc } from '../../convex/_generated/dataModel'
-import { literals } from 'convex-helpers/validators'
-
 export const shotStatusValues = [
   'default',
   'unsure',
@@ -8,9 +5,7 @@ export const shotStatusValues = [
   'animated',
 ] as const
 
-export const vShotStatus = literals(...shotStatusValues)
-
-export type ShotStatus = Doc<'shots'>['status']
+export type ShotStatus = typeof shotStatusValues[number]
 
 export function nextStatus(current: ShotStatus): ShotStatus {
   switch (current) {

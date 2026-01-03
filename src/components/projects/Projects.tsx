@@ -5,7 +5,7 @@ import { Id } from '../../../convex/_generated/dataModel'
 import { Button } from '@/components/ui/button.tsx'
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item.tsx'
 import { Skeleton } from '@/components/ui/skeleton.tsx'
-import { EllipsisVerticalIcon, PlusIcon, TrashIcon } from 'lucide-react'
+import { EllipsisVerticalIcon, TrashIcon } from 'lucide-react'
 import { AccountControls } from '@/AccountControls.tsx'
 import { Spinner } from '@/components/ui/spinner.tsx'
 import {
@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
 import { useState } from 'react'
+import { NewProjectButton } from '@/components/projects/NewProjectButton.tsx'
 
 export function Projects({
   onProjectSelected,
@@ -32,12 +33,11 @@ export function Projects({
   onProjectSelected: (projectId: Id<'projects'>) => void
 }) {
   const projects = useQuery(api.projects.getAll)
-  const createProject = useMutation(api.projects.create)
   if (!projects) {
     return <Spinner className={'size-12'} />
   }
   return projects.length === 0
-    ? <ProjectsEmptyState onNewProjectClicked={() => void createProject()} />
+    ? <ProjectsEmptyState/>
     : (
       <div className={'flex flex-col w-xl max-w-full gap-10 p-2'}>
         <div className={'flex flex-row items-center gap-2'}>
@@ -45,13 +45,7 @@ export function Projects({
             Your Projects
           </h1>
           <AccountControls />
-          <Button
-            className={'mb-4 self-end'}
-            onClick={() => void createProject()}
-          >
-            <PlusIcon />
-            New
-          </Button>
+          <NewProjectButton text={'New'}/>
         </div>
         <ul className={'flex flex-col gap-4'}>
           {projects.map(project => (
@@ -66,6 +60,7 @@ export function Projects({
       </div>
     )
 }
+
 
 function ProjectTile({
   projectId,
@@ -108,7 +103,8 @@ function ProjectTile({
                 className={'no-default-focus-ring'}
                 onSelect={() => setDeleteDialogOpen(true)}
               >
-                <TrashIcon/> Delete
+                <TrashIcon/>
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

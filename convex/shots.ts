@@ -1,8 +1,9 @@
 import { mutation, query } from './_generated/server'
 import { v } from 'convex/values'
-import { vShotStatus } from '../src/data-model/shot-status'
 import { editScene, editShot, withPermission } from './auth'
 import { getManyFrom } from 'convex-helpers/server/relationships'
+
+import { vShotStatus } from './schema'
 
 export const getForScene = query({
   args: {

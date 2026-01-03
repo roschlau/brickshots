@@ -1,7 +1,10 @@
 import { defineSchema, defineTable } from 'convex/server'
 import { v } from 'convex/values'
-import { vShotStatus } from '../src/data-model/shot-status'
 import { authTables } from '@convex-dev/auth/server'
+import { literals } from 'convex-helpers/validators'
+import { shotStatusValues } from '../src/data-model/shot-status'
+
+export const vShotStatus = literals(...shotStatusValues)
 
 export default defineSchema({
   ...authTables,
