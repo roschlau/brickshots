@@ -31,21 +31,25 @@ export const get = query({
 export const create = mutation({
   args: {
     sceneId: v.id('scenes'),
-    location: v.optional(v.string()),
+    atIndex: v.optional(v.number()),
+    shot: v.optional(v.object({
+      location: v.optional(v.string()),
+    })),
   },
-  handler: (ctx, { sceneId, location }) => withPermission(ctx,
+  handler: (ctx, { sceneId, atIndex, shot }) => withPermission(ctx,
     editScene(sceneId),
     async () => {
       const shotId = await ctx.db.insert('shots', {
         scene: sceneId,
         description: '',
         status: 'default',
-        location: location ?? '',
+        location: shot?.location ?? '',
         notes: '',
         lockedNumber: null,
       })
       const shotOrder = (await ctx.db.get('scenes', sceneId))?.shotOrder ?? []
-      await ctx.db.patch(sceneId, { shotOrder: [...shotOrder, shotId] })
+      shotOrder.splice(atIndex ?? shotOrder.length, 0, shotId)
+      await ctx.db.patch(sceneId, { shotOrder })
       return shotId
     },
   ),

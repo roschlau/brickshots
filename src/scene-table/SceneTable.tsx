@@ -44,13 +44,14 @@ export function SceneTable({ sceneId, sceneIndex, shotStatusFilter }: {
   const shotNumbers: Record<number, number> = {}
   const sceneNumber = getSceneNumber(scene ?? { lockedNumber: null }, sceneIndex)
   const addNewShot = async (index: number) => {
-    const shotId = await createShot({ sceneId, location: (shots[index - 1] ?? shots[index])?.location ?? undefined })
+    const shotId = await createShot({
+      sceneId,
+      atIndex: index,
+      shot: { location: (shots[index - 1] ?? shots[index])?.location ?? undefined },
+    })
     if (!shotId) {
       throw Error('Shot could not be created')
     }
-    const newShotOrder = scene?.shotOrder.slice() ?? []
-    newShotOrder.splice(index, 0, shotId)
-    await updateScene({ sceneId, data: { shotOrder: newShotOrder } })
   }
   const shotViewModels = shots
     .map((shot, shotIndex) => {
@@ -79,7 +80,7 @@ export function SceneTable({ sceneId, sceneIndex, shotStatusFilter }: {
         newShotOrder[indexInScene - 1] = current
         newShotOrder[indexInScene] = previous
         console.log('ROBIN', `swapWithPrevious`, newShotOrder)
-        await updateScene({ sceneId, data: { shotOrder: newShotOrder }})
+        await updateScene({ sceneId, data: { shotOrder: newShotOrder } })
       }
       return (
         <ShotTableRow
@@ -108,7 +109,7 @@ export function SceneTable({ sceneId, sceneIndex, shotStatusFilter }: {
           className={'grow self-stretch my-0.5 p-2 font-bold text-lg rounded-sm bg-transparent border-none placeholder-muted-foreground placeholder:font-normal'}
           value={scene?.description ?? ''}
           placeholder={'Add Scene Description'}
-          onChange={(event) => void updateScene({ sceneId, data: { description: event.target.value } }) }
+          onChange={(event) => void updateScene({ sceneId, data: { description: event.target.value } })}
         />
         <button
           className={'p-2 text-sm text-slate-500 hover:text-red-100 hover:bg-red-900 self-stretch'}
