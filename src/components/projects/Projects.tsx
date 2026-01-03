@@ -171,7 +171,7 @@ function DeleteProjectDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogActionDestructive onClick={onDeleteClicked}>
-            Continue
+            Delete
           </AlertDialogActionDestructive>
         </AlertDialogFooter>
       </AlertDialogContent>
