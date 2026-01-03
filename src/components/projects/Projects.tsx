@@ -5,7 +5,7 @@ import { Id } from '../../../convex/_generated/dataModel'
 import { Button } from '@/components/ui/button.tsx'
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item.tsx'
 import { Skeleton } from '@/components/ui/skeleton.tsx'
-import { EllipsisVerticalIcon, TrashIcon } from 'lucide-react'
+import { DownloadIcon, EllipsisVerticalIcon, TrashIcon } from 'lucide-react'
 import { AccountControls } from '@/AccountControls.tsx'
 import { Spinner } from '@/components/ui/spinner.tsx'
 import {
@@ -25,7 +25,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
 import { useState } from 'react'
-import { NewProjectButton } from '@/components/projects/NewProjectButton.tsx'
+import { CreateProjectButton } from '@/components/projects/CreateProjectButton.tsx'
+import toast from 'react-hot-toast'
+import { saveFile } from '@/lib/files.ts'
 
 export function Projects({
   onProjectSelected,
@@ -37,7 +39,7 @@ export function Projects({
     return <Spinner className={'size-12'} />
   }
   return projects.length === 0
-    ? <ProjectsEmptyState/>
+    ? <ProjectsEmptyState />
     : (
       <div className={'flex flex-col w-xl max-w-full gap-10 p-2'}>
         <div className={'flex flex-row items-center gap-2'}>
@@ -45,7 +47,7 @@ export function Projects({
             Your Projects
           </h1>
           <AccountControls />
-          <NewProjectButton text={'New'}/>
+          <CreateProjectButton text={'New'} />
         </div>
         <ul className={'flex flex-col gap-4'}>
           {projects.map(project => (
@@ -61,7 +63,6 @@ export function Projects({
     )
 }
 
-
 function ProjectTile({
   projectId,
   projectName,
@@ -73,7 +74,26 @@ function ProjectTile({
 }) {
   const projectDetails = useQuery(api.projects.getDetails, { projectId })
   const deleteProject = useMutation(api.projects.deleteProject)
+  const exportProject = useMutation(api.projects.exportProject)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const exportProjectClicked = () => toast.promise(async () => {
+    try {
+      setExporting(true)
+      const data = await exportProject({ projectId })
+      const filename = projectName.replace(/[^a-zA-Z0-9]/g, '_') + '.brickshot'
+      saveFile(JSON.stringify(data), filename)
+    } catch (error) {
+      console.error('Error exporting project:', error)
+    } finally {
+      setExporting(false)
+    }
+  }, {
+    loading: 'Exporting Project...',
+    success: 'Project Exported!',
+    error: 'Error Exporting Project!',
+  })
+
   return (
     <li>
       <Item variant={'outline'}>
@@ -99,11 +119,19 @@ function ProjectTile({
             </DropdownMenuTrigger>
             <DropdownMenuContent align={'end'}>
               <DropdownMenuItem
+                disabled={exporting}
+                className={'no-default-focus-ring'}
+                onSelect={() => void exportProjectClicked()}
+              >
+                {exporting ? <Spinner /> : <DownloadIcon />}
+                Export
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 variant={'destructive'}
                 className={'no-default-focus-ring'}
                 onSelect={() => setDeleteDialogOpen(true)}
               >
-                <TrashIcon/>
+                <TrashIcon />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>

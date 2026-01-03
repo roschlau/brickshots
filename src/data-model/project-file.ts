@@ -6,6 +6,7 @@ function vMaybe<V extends GenericValidator>(validator: V) {
 }
 
 const ProjectFileShot = v.object({
+  _id: v.optional(v.string()),
   status: vShotStatus,
   lockedNumber: vMaybe(v.number()),
   description: v.string(),
@@ -15,8 +16,10 @@ const ProjectFileShot = v.object({
 })
 
 export const ProjectFile = v.object({
+  _id: v.optional(v.string()),
   name: v.optional(v.string()),
   scenes: v.array(v.object({
+    _id: v.optional(v.string()),
     lockedNumber: vMaybe(v.number()),
     description: v.string(),
     shots: v.array(ProjectFileShot)

@@ -1,7 +1,7 @@
 import { api } from '../../../convex/_generated/api'
 import { ButtonGroup, ButtonGroupSeparator } from '@/components/ui/button-group.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { ChevronDownIcon, FolderUpIcon, PlusIcon } from 'lucide-react'
+import { ChevronDownIcon, FolderUpIcon, PlusIcon, UploadIcon } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +25,7 @@ import { Infer } from 'convex/values'
 import { Spinner } from '@/components/ui/spinner.tsx'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field.tsx'
 
-export function NewProjectButton({ text }: {
+export function CreateProjectButton({ text }: {
   text: string,
 }) {
   const createProject = useMutation(api.projects.create)
@@ -54,7 +54,7 @@ export function NewProjectButton({ text }: {
             className="no-default-focus-ring"
             onSelect={() => setImportDialogOpen(true)}
           >
-            <FolderUpIcon />
+            <UploadIcon />
             Import Project...
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -121,7 +121,7 @@ export function ImportProjectDialog({
             type={'file'}
             aria-invalid={invalidProjectFile}
             onChange={e => void onFileSelected(e)}
-            accept={'.json'}
+            accept={'.brickshot,.json'}
           />
           {invalidProjectFile
             ? <FieldError>This file could not be loaded as a BrickShot project. Please try another file.</FieldError>

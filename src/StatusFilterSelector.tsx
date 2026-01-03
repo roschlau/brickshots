@@ -1,6 +1,6 @@
 import {ShotStatus, shotStatusValues, statusIconCode} from './data-model/shot-status.ts'
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from '@headlessui/react'
-import {byOrder} from './comparatorUtils.ts'
+import {byOrder} from './lib/sorting.ts'
 import {Icon} from './ui-atoms/Icon.tsx'
 
 export function StatusFilterSelector({selected, onChange}: {
