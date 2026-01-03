@@ -36,7 +36,7 @@ export const create = mutation({
   handler: (ctx, { sceneId, location }) => withPermission(ctx,
     editScene(sceneId),
     async () => {
-      return await ctx.db.insert('shots', {
+      const shotId = await ctx.db.insert('shots', {
         scene: sceneId,
         description: '',
         status: 'default',
@@ -44,6 +44,9 @@ export const create = mutation({
         notes: '',
         lockedNumber: null,
       })
+      const shotOrder = (await ctx.db.get('scenes', sceneId))?.shotOrder ?? []
+      await ctx.db.patch(sceneId, { shotOrder: [...shotOrder, shotId] })
+      return shotId
     },
   ),
 })
