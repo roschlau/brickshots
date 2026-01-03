@@ -6,6 +6,7 @@ import { ShotStatus } from '../data-model/shot-status.ts'
 import { Doc } from '../../convex/_generated/dataModel'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
+import { byOrder } from '@/lib/sorting.ts'
 
 interface ShotViewModel {
   indexInScene: number,
@@ -20,6 +21,9 @@ export function SceneTable({ sceneId, sceneIndex, shotStatusFilter }: {
 }) {
   const scene = useQuery(api.scenes.get, { id: sceneId })
   const shots = useQuery(api.shots.getForScene, { sceneId }) ?? []
+  if (scene) {
+    shots.sort(byOrder(scene.shotOrder, shot => shot._id))
+  }
   const createShot = useMutation(api.shots.create)
   const updateScene = useMutation(api.scenes.update).withOptimisticUpdate(
     (localStore, { sceneId, data }) => {
@@ -68,11 +72,13 @@ export function SceneTable({ sceneId, sceneIndex, shotStatusFilter }: {
         const newShotOrder = scene.shotOrder.slice()
         const previous = newShotOrder[indexInScene - 1]
         const current = newShotOrder[indexInScene]
+        console.log('ROBIN', `swapWithPrevious`, indexInScene, previous, current, newShotOrder)
         if (current === undefined || previous === undefined) {
           throw Error()
         }
         newShotOrder[indexInScene - 1] = current
         newShotOrder[indexInScene] = previous
+        console.log('ROBIN', `swapWithPrevious`, newShotOrder)
         await updateScene({ sceneId, data: { shotOrder: newShotOrder }})
       }
       return (
